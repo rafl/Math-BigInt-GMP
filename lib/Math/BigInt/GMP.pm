@@ -12,7 +12,7 @@ require DynaLoader;
 
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 bootstrap Math::BigInt::GMP $VERSION;
 
@@ -22,22 +22,12 @@ sub api_version() { 1; }	# we are compatible with MBI v1.70 and up
 
 BEGIN
   {
-  # noth _num and _str just return a string
+  # both _num and _str just return a string
   *_str = \&_num;
   }
 
 ##############################################################################
-# actual math code
-
-sub _sub
-  {
-  # $x is always larger than $y! So overflow/underflow can not happen here
-  if ($_[3])
-    {
-    $_[2] = Math::BigInt::GMP::sub_two($_[1],$_[2]); return $_[2];
-    }
-  Math::BigInt::GMP::_sub_in_place($_[1],$_[2]);
-  }                                                                             
+# actual math code (this could also be put into GMP.xs for more speed)
 
 sub _div
   {
@@ -79,10 +69,6 @@ sub _check
   return "$x is not a reference to Math::BigInt::GMP"
    if ref($x) ne 'Math::BigInt::GMP';
   0;
-  }
-
-sub _log_int1
-  {
   }
 
 sub _log_int
@@ -161,7 +147,7 @@ the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Tels <http://bloodgate.com/> in 2001-2003.
+Tels <http://bloodgate.com/> in 2001-2004.
 
 Thanx to Chip Turner for providing Math::GMP, which was inspiring my work.
 

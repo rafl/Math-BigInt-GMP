@@ -130,6 +130,12 @@
     meaning brsft() and blsft() got about 20% faster in BigInt
   * added a working _zeros() method
   * added a working _log_int() method
+2004-11-22 v1.15 Tels 5112 tests
+  * some small cleanups in the Perl code
+  * changed "class" to "Class" to avoid the reserved keyword for MS compiler
+  * do not pull unused parameter "Class" from stack - avoid compiler warnings
+  * put _sub() into XS for more speed and smaller memory footprint
+  * testsuite from MBI v1.73
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

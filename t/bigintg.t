@@ -9,7 +9,7 @@ BEGIN
   chdir 't' if -d 't';
   unshift @INC, '../lib';		# for running manually
   unshift @INC, '../blib/arch';		# for running manually
-  plan tests => 279;
+  plan tests => 286;
   }
 
 use Math::BigInt::GMP;
@@ -26,6 +26,8 @@ ok (ref($x),'Math::BigInt::GMP'); ok ($C->_str($x),123); ok ($C->_str($y),321);
 # _add, _sub, _mul, _div
 ok ($C->_str($C->_add($x,$y)),444);
 ok ($C->_str($C->_sub($x,$y)),123);
+ok ($C->_str($x),123);
+ok ($C->_str($y),321);
 ok ($C->_str($C->_mul($x,$y)),39483);
 ok ($C->_str(scalar $C->_div($x,$y)),123);
 
@@ -45,9 +47,29 @@ $C->_inc($x1);
 ok ("$x1","$x");
 ok ($C->_str($r1),'0');
 
-$x = $C->_new("39483");	# reset
+###############################################################################
+# check that sub modifies the right argument:
+
+$x = $C->_new("221");
+$y = $C->_new("444");
+
+$x = $C->_sub($y,$x,1);			# 444 - 221 => 223
+
+ok ($C->_str($x),223);
+ok ($C->_str($y),444);
+
+$x = $C->_new("444");
+$y = $C->_new("221");
+
+ok ($C->_str($C->_sub($x,$y)),223);	# 444 - 221 => 223
+
+ok ($C->_str($x),223);
+ok ($C->_str($y),221);
 
 ###############################################################################
+$x = $C->_new("39483");	# reset
+$y = $C->_new("321");	# reset
+
 my $z = $C->_new("2");
 ok ($C->_str($C->_add($x,$z)),39485);
 my ($re,$rr) = $C->_div($x,$y);

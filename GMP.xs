@@ -27,8 +27,7 @@ PROTOTYPES: ENABLE
 # _new() 
 
 mpz_t *
-_new(class,x)
-	SV*	class
+_new(Class,x)
 	SV*	x
 
   CODE:
@@ -41,8 +40,7 @@ _new(class,x)
 # _from_bin()
 
 mpz_t *
-_from_bin(class,x)
-	SV*	class
+_from_bin(Class,x)
 	SV*	x
 
   CODE:
@@ -55,8 +53,7 @@ _from_bin(class,x)
 # _from_hex()
 
 mpz_t *
-_from_hex(class,x)
-	SV*	class
+_from_hex(Class,x)
 	SV*	x
 
   CODE:
@@ -69,8 +66,7 @@ _from_hex(class,x)
 # _zero()
 
 mpz_t *
-_zero(class)
-	SV* class
+_zero(Class)
 
   CODE:
     NEW_GMP_MPZ_T;
@@ -82,8 +78,7 @@ _zero(class)
 # _one()
 
 mpz_t *
-_one(class)
-	SV* class
+_one(Class)
 
   CODE:
     NEW_GMP_MPZ_T;
@@ -95,8 +90,7 @@ _one(class)
 # _two()
 
 mpz_t *
-_two(class)
-	SV* class
+_two(Class)
 
   CODE:
     NEW_GMP_MPZ_T;
@@ -108,8 +102,7 @@ _two(class)
 # _ten()
 
 mpz_t *
-_ten(class)
-	SV* class
+_ten(Class)
 
   CODE:
     NEW_GMP_MPZ_T;
@@ -133,8 +126,7 @@ DESTROY(n)
 # _num() - numify, return string so that atof() and atoi() can use it
 
 SV *
-_num(class, n)
-	SV*	class
+_num(Class, n)
 	mpz_t*	n
   PREINIT:
     int len;
@@ -159,15 +151,14 @@ _num(class, n)
 
 ##############################################################################
 # _zeros() - return string
-#
+
 int
-_zeros(class,n)
-	SV*	class
+_zeros(Class,n)
 	mpz_t*	n
 
   PREINIT:
     SV*	TEMP;
-    int len, zeros;
+    int len;
     char *buf;
     char *buf_end;
 
@@ -203,8 +194,7 @@ _zeros(class,n)
 # _as_hex() - return ref to hexadecimal string (prefixed with 0x)
 
 SV *
-_as_hex(class,n)
-	SV* class
+_as_hex(Class,n)
 	mpz_t *	n
 
   PREINIT:
@@ -227,8 +217,7 @@ _as_hex(class,n)
 # _as_bin() - return ref to binary string (prefixed with 0b)
 
 SV *
-_as_bin(class,n)
-	SV*	class
+_as_bin(Class,n)
 	mpz_t *	n
 
   PREINIT:
@@ -252,8 +241,7 @@ _as_bin(class,n)
 # _modpow() - ($n ** $exp) % $mod
 
 mpz_t *
-_modpow(class, n, exp, mod)
-       SV*	class
+_modpow(Class, n, exp, mod)
        mpz_t*	n
        mpz_t*	exp
        mpz_t*	mod
@@ -274,8 +262,7 @@ _modpow(class, n, exp, mod)
 # is undefined.
 
 void
-_modinv(class,x,y)
-	SV*	class
+_modinv(Class,x,y)
 	mpz_t*	x
 	mpz_t*	y
 
@@ -316,8 +303,7 @@ _modinv(class,x,y)
 # _add() - add $y to $x in place
 
 void
-_add(class,x,y)
-	SV*	class
+_add(Class,x,y)
 	SV*	x
 	SV*	y
   PREINIT:
@@ -333,8 +319,7 @@ _add(class,x,y)
 # _inc() - modify x inline by doing x++
 
 void
-_inc(class,x)
-	SV*	class
+_inc(Class,x)
 	SV*	x
   PREINIT:
 	mpz_t* TEMP;  
@@ -347,8 +332,7 @@ _inc(class,x)
 # _dec() - modify x inline by doing x--
 
 void
-_dec(class,x)
-	SV*	class
+_dec(Class,x)
 	SV*	x
   PREINIT:
 	mpz_t* TEMP;  
@@ -358,41 +342,49 @@ _dec(class,x)
     PUSHs( x );
 
 ##############################################################################
-# _sub_in_place() - $x -= $y
+# _sub() - $x - $y
+# $x is always larger than $y! So overflow/underflow can not happen here.
+# Formerly this code was:
+# # if ($_[3])
+#    {
+#    $_[2] = Math::BigInt::GMP::sub_two($_[1],$_[2]); return $_[2];
+#    }
+#  Math::BigInt::GMP::_sub_in_place($_[1],$_[2]);
+#  }
 
 void
-_sub_in_place(x,y)
+_sub(Class,x,y, ...)
         SV*     x
         SV*     y
   PREINIT:
         mpz_t* TEMP;
         mpz_t* TEMP_1;
+        mpz_t* TEMP_2;
   PPCODE:
     GMP_GET_ARGS_0_1;	/* (TEMP, TEMP_1) = (x,y)  */
-    mpz_sub(*TEMP, *TEMP, *TEMP_1);
-    PUSHs( x );
+    if ( items == 4 && SvTRUE(ST(3)) ) 
+      {
+      /* return new(y - x) */ 
+      /* need to create TEMP_2 or it will ssegfault */
+      TEMP_2 = malloc (sizeof(mpz_t)); mpz_init(*TEMP_2);
 
-##############################################################################
-# _sub_two() - return $x - $y
+      mpz_sub(*TEMP_2, *TEMP, *TEMP_1);
 
-mpz_t *
-sub_two(m,n)
-	mpz_t *		m
-	mpz_t *		n
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    mpz_sub(*RETVAL, *m, *n);
-  OUTPUT:
-    RETVAL
-
+      /* PUSHs(sv_setref_pv(sv_newmortal(), "Math::BigInt::GMP", (void*)TEMP_2)); */
+      PUSHs(sv_setref_pv(y, "Math::BigInt::GMP", (void*)TEMP_2));
+      }
+    else
+      {
+      /* x -= y */
+      mpz_sub(*TEMP, *TEMP, *TEMP_1);
+      PUSHs( x );
+      }
 
 ##############################################################################
 # _rsft()
 
 void
-_rsft(class,x,y,base_sv)
-	SV*	class
+_rsft(Class,x,y,base_sv)
 	SV*	x
 	SV*	y
 	SV*	base_sv
@@ -418,9 +410,8 @@ _rsft(class,x,y,base_sv)
 ##############################################################################
 # _lsft()
 
-mpz_t *
-_lsft(class,x,y,base_sv)
-	SV*	class
+void
+_lsft(Class,x,y,base_sv)
 	SV*	x
 	SV*	y
 	SV*	base_sv
@@ -447,8 +438,7 @@ _lsft(class,x,y,base_sv)
 # _mul()
 
 void
-_mul(class,x,y)
-	SV*	class
+_mul(Class,x,y)
         SV*     x
         SV*     y
   PREINIT:
@@ -500,8 +490,7 @@ bdiv_two(m,n)
 # _mod() : x %= y
 
 void
-_mod(class,x,y)
-	SV*	class
+_mod(Class,x,y)
         SV*     x
         SV*     y
   PREINIT:
@@ -516,8 +505,7 @@ _mod(class,x,y)
 # _acmp() - cmp two numbers
 
 int
-_acmp(class,m,n)
-	SV*	class
+_acmp(Class,m,n)
 	mpz_t *	m
 	mpz_t *	n
 
@@ -532,8 +520,7 @@ _acmp(class,m,n)
 # _is_zero()  
 
 int
-_is_zero(class,x)
-	SV*	class
+_is_zero(Class,x)
 	mpz_t *	x
 
   CODE:
@@ -546,8 +533,7 @@ _is_zero(class,x)
 # _is_one()  
 
 int
-_is_one(class,x)
-	SV*	class
+_is_one(Class,x)
 	mpz_t *	x
 
   CODE:
@@ -560,8 +546,7 @@ _is_one(class,x)
 # _is_two()  
 
 int
-_is_two(class,x)
-	SV*	class
+_is_two(Class,x)
 	mpz_t *	x
 
   CODE:
@@ -574,8 +559,7 @@ _is_two(class,x)
 # _is_ten()  
 
 int
-_is_ten(class,x)
-	SV*	class
+_is_ten(Class,x)
 	mpz_t *	x
 
   CODE:
@@ -588,8 +572,7 @@ _is_ten(class,x)
 # _pow() - m **= n
 
 void
-_pow(class,x,y)
-        SV*     class
+_pow(Class,x,y)
         SV*     x
         SV*     y
   PREINIT:
@@ -604,8 +587,7 @@ _pow(class,x,y)
 # _gcd() - gcd(m,n)
 
 mpz_t *
-_gcd(class,x,y)
-	SV*	class
+_gcd(Class,x,y)
 	mpz_t*	x
 	mpz_t*	y
 
@@ -619,8 +601,7 @@ _gcd(class,x,y)
 # _and() - m &= n
 
 void
-_and(class,x,y)
-        SV*     class
+_and(Class,x,y)
         SV*     x
         SV*     y
   PREINIT:
@@ -636,8 +617,7 @@ _and(class,x,y)
 # _xor() - m =^ n
 
 void
-_xor(class,x,y)
-        SV*     class
+_xor(Class,x,y)
         SV*     x
         SV*     y
   PREINIT:
@@ -653,8 +633,7 @@ _xor(class,x,y)
 # _or() - m =| n
 
 void
-_or(class,x,y)
-        SV*     class
+_or(Class,x,y)
         SV*     x
         SV*     y
   PREINIT:
@@ -670,8 +649,7 @@ _or(class,x,y)
 # _fac() - n! (factorial)
 
 void
-_fac(class,x)
-        SV*     class
+_fac(Class,x)
         SV*     x
   PREINIT:
         mpz_t* TEMP;
@@ -685,9 +663,8 @@ _fac(class,x)
 # _copy()
 
 mpz_t *
-_copy(class,m)
-        SV*		class
-	mpz_t *		m
+_copy(Class,m)
+	mpz_t*	m
 
   CODE:
     NEW_GMP_MPZ_T;
@@ -700,9 +677,8 @@ _copy(class,m)
 # _is_odd() - test for number beeing odd
 
 int
-_is_odd(class,n)
-        SV*		class
-	mpz_t *		n
+_is_odd(Class,n)
+	mpz_t*	n
 
   CODE:
    RETVAL = mpz_tstbit(*n,0);
@@ -713,9 +689,8 @@ _is_odd(class,n)
 # _is_even() - test for number beeing even
 
 int
-_is_even(class,n)
-        SV*		class
-	mpz_t *		n
+_is_even(Class,n)
+	mpz_t*	n
 
   CODE:
      RETVAL = ! mpz_tstbit(*n,0);
@@ -726,8 +701,7 @@ _is_even(class,n)
 # _sqrt() - square root
 
 void
-_sqrt(class,x)
-        SV*     class
+_sqrt(Class,x)
         SV*     x
   PREINIT:
         mpz_t* TEMP;
@@ -741,8 +715,7 @@ _sqrt(class,x)
 # _root() - integer roots
 
 void
-_root(class,x,y)
-        SV*     class
+_root(Class,x,y)
         SV*     x
         SV*     y
   PREINIT:

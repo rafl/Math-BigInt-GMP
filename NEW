@@ -1,11 +1,28 @@
 
 Changes between the last and this version:
 
-v1.14:
-  * tests from BigInt v1.70
-  * we are compatible with API form BigInt v1.70
-  * _rsft() and _lsft() modify their argument instead of making a copy,
-    meaning brsft() and blsft() got about 20% faster in BigInt
-  * added a working _zeros() method
-  * added a working _log_int() method
+v1.15:
+  * some small cleanups in the Perl code
+  * changed "class" to "Class" to avoid the reserved keyword for MS compiler
+  * do not pull unused parameter "Class" from stack - avoid warnings when
+    compiling - that makes the .so a tad smaller and should make it ever so
+    slightly faster, too
+  * put _sub() into XS for more speed and smaller memory footprint
+  * testsuite from MBI v1.73
 
+#############################################################################
+
+Benchmarking Math::BigInt sub (e.g. what an actual user would see):
+
+Math::BigInt v1.73, Math::BigInt::GMP v1.14:
+
+ 221 - 444:  5s (5.23 usr +  0.02 sys =  5.25 CPU) @ 15603/s (n=81919)
+ 444 - 221:  6s (5.21 usr +  0.02 sys =  5.23 CPU) @ 16968/s (n=88744)
+
+Math::BigInt v1.73, Math::BigInt::GMP v1.15:
+
+Benchmark: running 221 - 444, 444 - 221 for at least 5 CPU seconds...
+ 221 - 444:  5s (5.25 usr +  0.02 sys =  5.27 CPU) @ 18031/s (n=95024)  +15%
+ 444 - 221:  5s (5.15 usr +  0.01 sys =  5.16 CPU) @ 18080/s (n=93297)  + 6%
+
+#############################################################################
