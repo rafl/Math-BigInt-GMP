@@ -9,22 +9,13 @@ use strict;
 
 require Exporter;
 
-use vars qw/ @ISA @EXPORT $VERSION/;
+use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-@EXPORT = qw(
-        _add _mul _div _mod _sub
-        _new
-        _str _num _acmp _len
-        _digit
-        _is_zero _is_one
-        _is_even _is_odd
-        _check _zero _one _copy _len
-	_pow _dec _inc
-);
-$VERSION = '1.01';
+$VERSION = '1.02';
         
 # todo: _from_hex _from_bin
+#       _as_hex _as_bin
 #       _gcd
 #	_and _or _xor
 
@@ -55,6 +46,8 @@ sub _copy
   # return Math::GMP->new("$_[1]");	# this is O(N*N)
   return $_[1]+0;			# this should be O(N)	
   }
+
+sub import { }
 
 ##############################################################################
 # convert back to string and number

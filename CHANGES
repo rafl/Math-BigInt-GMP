@@ -6,6 +6,9 @@
  * first release
  * fixed all the bugs in v1.00
  * taken over tests from BigInt v1.40
+2001-09-02 v1.02: Tels
+ * removed auto-export and added empty import()
+ * taken over tests from BigInt v1.42
  
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

@@ -1,5 +1,5 @@
 
-* _copy() could be slower, find native copy method
+* _copy() could be faster, find native copy method
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
