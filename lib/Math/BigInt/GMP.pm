@@ -12,7 +12,7 @@ require Exporter;
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
         
 # todo: _as_hex _as_bin _rsft _lsft
 
@@ -182,20 +182,6 @@ sub _fac
   $_[1] = Math::GMP::gmp_fac($_[1]);
   }
 
-sub _fac_slow
-  {
-  # factorial of $x
-  my ($c,$x) = @_;
-
-  my $n = _copy($c,$x);
-  $x = $one;
-  while (!_is_one($c,$n))
-    {
-    $x = Math::GMP::mul_two($x,$n); $n = Math::GMP::sub_two($n,$one);
-    }
-  $x; 
-  }
-
 ##############################################################################
 # _is_* routines
 
@@ -210,9 +196,6 @@ sub _is_one
   # return true if arg is one
   $_[1] == $one ? 1 : 0;
   }
-
-#sub _is_even { $_[1] % $two ? 0 : 1; }
-#sub _is_odd { $_[1] % $two ? 1 : 0; }
 
 sub _is_even { Math::GMP::gmp_tstbit($_[1],0) ? 0 : 1; }
 sub _is_odd { Math::GMP::gmp_tstbit($_[1],0) ? 1 : 0; }

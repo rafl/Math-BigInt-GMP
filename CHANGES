@@ -61,10 +61,13 @@
   small numbers and quickly raise as the numbers grow ;)
   The speedup for bmod() and bdiv() aren't that dramatic, but still worth it.
 2002-03-23 v1.06 Tels
-  * fixed PREREQUISITES to Math::GMP 2.03, BigInt 1.55
+  * testsuite from v1.55 - 3874 tests
+  * fixed PREREQUISITES to Math::GMP v2.03, BigInt v1.55
   * fixed typos in CHANGES
   * added _from_bin()
-  * testsuite from v1.55
+2002-07-07 v1.07 Tels
+  * testsuite from BigInt v1.60 - 4054 tests 
+  * fixed PREREQUISITES to BigInt v1.60
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
