@@ -93,6 +93,14 @@
       mod_l:  4s ( 3.31 usr +  0.00 sys =  3.31 CPU) @ 6851.96/s (n=22680)
       mod_s:  3s ( 3.01 usr +  0.00 sys =  3.01 CPU) @ 7088.37/s (n=21336)
   * Full (memory and other) benchmarks at http://bloodgate.com/perl/bigint/
+2003-01-01 v1.11 Tels 4109 tests
+  * rewrote stringify_bin() and stringify_hex() to not allocate scratch buffers
+    Faster, no longer needs malloc()/free() and strlen().
+    Thanx to Sysiphus for pointing this out.
+  * removed _as_hex() and _as_bin() from GMP.pm and moved the logic to GMP.xs 
+  * documented in todo to replace all malloc()/free() with New and Safefree()
+  * removed unused cmp_two() function in GMP.xs
+  * removed the unused "$zero = ..."/"$one = ..." in GMP.pm
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

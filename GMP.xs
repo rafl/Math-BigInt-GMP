@@ -11,6 +11,7 @@ high-speed arbitrary size integer calculations (C) 2000 James H. Turner
 MODULE = Math::BigInt::GMP		PACKAGE = Math::BigInt::GMP
 PROTOTYPES: ENABLE
 
+#define NEW_GMP_MPZ_T RETVAL = malloc (sizeof(mpz_t));
 
 ##############################################################################
 # _new() 
@@ -24,7 +25,7 @@ _new(class,x)
 
   CODE:
     s = (SV*)SvRV(x);			/* ref to string, don't check ref */
-    RETVAL = malloc (sizeof(mpz_t));
+    NEW_GMP_MPZ_T;
     mpz_init_set_str(*RETVAL, SvPV_nolen(s), 0);
   OUTPUT:
     RETVAL
@@ -41,7 +42,7 @@ _from_bin(class,x)
 
   CODE:
     s = (SV*)SvRV(x);			/* ref to string, don't check ref */
-    RETVAL = malloc (sizeof(mpz_t));
+    NEW_GMP_MPZ_T;
     mpz_init_set_str(*RETVAL, SvPV_nolen(s), 0);
   OUTPUT:
     RETVAL
@@ -58,7 +59,7 @@ _from_hex(class,x)
 
   CODE:
     s = (SV*)SvRV(x);			/* ref to string, don't check ref */
-    RETVAL = malloc (sizeof(mpz_t));
+    NEW_GMP_MPZ_T;
     mpz_init_set_str(*RETVAL, SvPV_nolen(s), 0);
   OUTPUT:
     RETVAL
@@ -71,7 +72,7 @@ _zero(class)
 	SV* class
 
   CODE:
-    RETVAL = malloc (sizeof(mpz_t));
+    NEW_GMP_MPZ_T;
     mpz_init_set_ui(*RETVAL, 0);
   OUTPUT:
     RETVAL
@@ -84,7 +85,7 @@ _one(class)
 	SV* class
 
   CODE:
-    RETVAL = malloc (sizeof(mpz_t));
+    NEW_GMP_MPZ_T;
     mpz_init_set_ui(*RETVAL, 1);
   OUTPUT:
     RETVAL
@@ -158,46 +159,54 @@ _str(class,n)
     RETVAL
 
 ##############################################################################
-# __stringify_hex()
+# _as_hex() - return ref to hexadecimal string (prefixed with 0x)
 
 SV *
-__stringify_hex(n)
+_as_hex(class,n)
+	SV* class
 	mpz_t *	n
 
   PREINIT:
     int len;
+    char *buf;
     
   CODE:
-    len = mpz_sizeinbase(*n, 16);
-    {
-      char *buf;
-      buf = malloc(len + 2);
-      mpz_get_str(buf, 16, *n);
-      RETVAL = newSVpv(buf, strlen(buf));
-      free(buf);
-    }
+    /* len is always >= 1, and accurate (unlike in decimal) */
+    len = mpz_sizeinbase(*n, 16); if (len == 0) { len = 1; }
+    len += 2;
+    RETVAL = newSV(len);		/* alloc len +1 (+2 for '0x') bytes */
+    SvPOK_on(RETVAL);
+    buf = SvPVX(RETVAL);		/* get ptr to storage */
+    *buf++ = '0'; *buf++ = 'x';		/* prepend '0x' */
+    mpz_get_str(buf, 16, *n);		/* convert to hexadecimal string */
+    SvCUR_set(RETVAL, len); 		/* so set real length */
+    RETVAL = newRV_noinc(RETVAL);	/* return ref to string */
   OUTPUT:
     RETVAL
 
 ##############################################################################
-# __stringify_bin()
+# _as_bin() - return ref to binary string (prefixed with 0b)
 
 SV *
-__stringify_bin(n)
+_as_bin(class,n)
+	SV*	class
 	mpz_t *	n
 
   PREINIT:
     int len;
+    char *buf;
     
   CODE:
-    len = mpz_sizeinbase(*n, 2);
-    {
-      char *buf;
-      buf = malloc(len + 2);
-      mpz_get_str(buf, 2, *n);
-      RETVAL = newSVpv(buf, strlen(buf));
-      free(buf);
-    }
+    /* len is always >= 1, and accurate (unlike in decimal) */
+    len = mpz_sizeinbase(*n, 2); if (len == 0) { len = 1; }
+    len += 2;
+    RETVAL = newSV(len);		/* alloc len +1 (+2 for '0b') bytes */
+    SvPOK_on(RETVAL);
+    buf = SvPVX(RETVAL);		/* get ptr to storage */ 
+    *buf++ = '0'; *buf++ = 'b';		/* prepend '0b' */
+    mpz_get_str(buf, 2, *n);		/* convert to binary string */
+    SvCUR_set(RETVAL, len); 		/* so set real length */
+    RETVAL = newRV_noinc(RETVAL);	/* return ref to string */
   OUTPUT:
     RETVAL
 
@@ -448,22 +457,6 @@ _mod(class,x,y)
     mpz_init(*RETVAL);
     mpz_mod(*RETVAL, *x, *y);
     mpz_set(*x, *RETVAL);
-  OUTPUT:
-    RETVAL
-
-
-##############################################################################
-# _cmp_two()
-
-int
-cmp_two(m,n)
-	mpz_t *		m
-	mpz_t *		n
-
-  CODE:
-    RETVAL = mpz_cmp(*m, *n);
-    if ( RETVAL < 0) { RETVAL = -1; }
-    if ( RETVAL > 0) { RETVAL = 1; }
   OUTPUT:
     RETVAL
 

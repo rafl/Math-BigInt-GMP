@@ -13,12 +13,9 @@ require DynaLoader;
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter DynaLoader);
 
-$VERSION = '1.10';
-        
-bootstrap Math::BigInt::GMP $VERSION;
+$VERSION = '1.11';
 
-my $zero = Math::BigInt::GMP->_zero();
-my $one  = Math::BigInt::GMP->_one();
+bootstrap Math::BigInt::GMP $VERSION;
 
 BEGIN
   {
@@ -29,20 +26,6 @@ sub import { }		# catch and throw away
 
 ##############################################################################
 # convert back to string and number
-
-sub _as_hex
-  {
-  # make hexadecimal string
-  my $r = '0x' . Math::BigInt::GMP::__stringify_hex($_[1]);
-  \$r;
-  }
-
-sub _as_bin
-  {
-  # make binary string
-  my $r = '0b' . Math::BigInt::GMP::__stringify_bin($_[1]);
-  \$r;
-  }
 
 sub _num
   {
