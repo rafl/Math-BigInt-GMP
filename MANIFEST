@@ -12,4 +12,3 @@ t/bigintpm.t			# original test, but with Math::GMP
 t/bigintpm.inc			# actual tests
 t/bigfltpm.t			# original test, but with Math::GMP 
 t/bigfltpm.inc			# actual tests
-t/Math/Subclass.pm

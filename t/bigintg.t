@@ -8,7 +8,7 @@ BEGIN
   $| = 1;
   # chdir 't' if -d 't';
   unshift @INC, '../lib'; # for running manually
-  plan tests => 54;
+  plan tests => 59;
   }
 
 # testing of Math::BigInt::GMP, primarily for interface/api and not for the
@@ -110,8 +110,14 @@ ok (${$C->_str($x)},'444');
 ok (${$C->_str($y)},'123');
 
 # _gcd
-#$x = $C->_new(\"128"); $y = $C->_new(\'96'); $x = $C->_gcd($x,$y);
-#ok (${$C->_str($x)},'32');
+$x = $C->_new(\"128"); $y = $C->_new(\'96'); $x = $C->_gcd($x,$y);
+ok (${$C->_str($x)},'32');
+
+# _fac
+$x = $C->_new(\"1"); $x = $C->_fac($x,$y); ok (${$C->_str($x)},'1');
+$x = $C->_new(\"2"); $x = $C->_fac($x,$y); ok (${$C->_str($x)},'2');
+$x = $C->_new(\"3"); $x = $C->_fac($x,$y); ok (${$C->_str($x)},'6');
+$x = $C->_new(\"4"); $x = $C->_fac($x,$y); ok (${$C->_str($x)},'24');
 
 # should not happen:
 # $x = $C->_new(\"-2"); $y = $C->_new(\"4"); ok ($C->_acmp($x,$y),-1);

@@ -1,15 +1,15 @@
 
 
-2001-07-22 v1.00: Tels
+2001-07-22 v1.00 Tels
  * First version (basically working with some quirks)
-2001-08-06 v1.01: Tels
+2001-08-06 v1.01 Tels
  * first release
  * fixed all the bugs in v1.00
  * taken over tests from BigInt v1.40
-2001-09-02 v1.02: Tels
+2001-09-02 v1.02 Tels
  * removed auto-export and added empty import()
  * taken over tests from BigInt v1.42
-2001-11-01 v1.03: Tels
+2001-11-01 v1.03 Tels
  * taken over tests from BigInt v1.45 
  * added _mod() for more speed for $x % $y
 
@@ -39,6 +39,14 @@
 	mod_s    1100	 2350 
 	mod_l    1111    2325
 	div_l    1260    1300
+
+2001-11-01 v1.04a Tels (never released)
+  * _is_odd()/_is_even() use $two instead of 2: 5600 op/s instead of 4700
+2002-01-26 v1.04 Tels
+  * use $zero,$one,$two etc instead of 0,1,2 ins some routines
+  * tests from Math::BigInt v1.50
+  * bypass Math::GMP's overload interface and use Math::GMP::gmp_foo() directly
+  * added _gcd() and _fac() for more speed in bgcd() and bfac(), respectively
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

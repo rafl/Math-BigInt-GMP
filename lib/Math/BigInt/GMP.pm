@@ -12,14 +12,18 @@ require Exporter;
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
         
 # todo: _from_hex _from_bin
 #       _as_hex _as_bin
-#       _gcd
 #	_and _or _xor
 
 use Math::GMP;
+
+# for _inc, _dec, _is_odd, _is_even, _is_one, _is_zero etc
+my $zero = Math::GMP::new_from_scalar(0);		
+my $one  = Math::GMP::new_from_scalar(1);
+my $two  = Math::GMP::new_from_scalar(2);
 
 ##############################################################################
 # create objects from various representations
@@ -28,23 +32,24 @@ sub _new
   {
   # (string) return ref to num
   my $d = $_[1];
-  return Math::GMP->new($$d);
+  Math::GMP::new_from_scalar($$d);
   }                                                                             
 
 sub _zero
   {
-  return Math::GMP->new(0);
+  Math::GMP::new_from_scalar(0);
   }
 
 sub _one
   {
-  return Math::GMP->new(1);
+  Math::GMP::new_from_scalar(1);
   }
 
 sub _copy
   {
   # return Math::GMP->new("$_[1]");	# this is O(N*N)
-  return $_[1]+0;			# this should be O(N)	
+  $_[1]+0;				# this should be O(N)	
+#  $_[1];		# Math::GMP::gmp_foo() already makes copy in every case
   }
 
 sub import { }
@@ -55,40 +60,44 @@ sub import { }
 sub _str
   {
   # make string
-  my $x = $_[1];
-  return \"$x";
+  my $r = Math::GMP::stringify_gmp($_[1]);
+  \$r;
   }                                                                             
 
 sub _num
   {
   # make a number
   # let Perl's atoi() handle this one
-  my $x = $_[1];
-  return "$x";
+  Math::GMP::stringify_gmp($_[1]);
+  # "$_[1]";
   }
-
 
 ##############################################################################
 # actual math code
 
-sub _add { $_[1] += $_[2]; }
+#sub _add { $_[1] += $_[2]; }
+sub _add { $_[1] = Math::GMP::add_two($_[1],$_[2]); }
 
 sub _sub
   {
   # $x is always larger than $y! So overflow/underflow can not happen here
   if ($_[3])
     {
-    $_[2] = $_[1] - $_[2]; return $_[2];
+    $_[2] = Math::GMP::sub_two($_[1],$_[2]); return $_[2];
+   # $_[2] = $_[1] - $_[2]; return $_[2];
     }
-  else
-    {
-    $_[1] -= $_[2]; return $_[1];
-    }
+#  else
+#    {
+   $_[1] = Math::GMP::sub_two($_[1],$_[2]); return $_[1];
+#    $_[1] -= $_[2]; return $_[1];
+#    }
   }                                                                             
 
-sub _mul { $_[1] *= $_[2]; }
+#sub _mul { $_[1] *= $_[2]; }
+sub _mul { $_[1] = Math::GMP::mul_two($_[1],$_[2]); }
 
-sub _mod { $_[1] %= $_[2]; }
+#sub _mod { $_[1] %= $_[2]; }
+sub _mod { $_[1] = Math::GMP::mod_two($_[1],$_[2]); }
 
 sub _div {
     if (wantarray) {
@@ -101,8 +110,8 @@ sub _div {
     $_[1];
 }
 
-sub _inc { ++$_[1]; }
-sub _dec { --$_[1]; }
+sub _inc { $_[1] = Math::GMP::add_two($_[1],$one); }
+sub _dec { $_[1] = Math::GMP::sub_two($_[1],$one); }
 
 # does not work
 #sub _and { $_[1] &= $_[2]; }
@@ -122,7 +131,8 @@ sub _acmp
 sub _len
   {
   # return length, aka digits in decmial, costly!!
-  return length("$_[1]");
+  length( Math::GMP::stringify_gmp($_[1]) );
+  #length("$_[1]");
   }
 
 sub _digit
@@ -130,7 +140,8 @@ sub _digit
   # return the nth digit, negative values count backward; this is costly!
   my ($c,$x,$n) = @_;
 
-  $n++; return substr("$x",-$n,1);
+  # $n++; substr("$x",-$n,1);
+  $n++; substr( Math::GMP::stringify_gmp($x), -$n, 1 );
   }
 
 sub _pow { $_[1] **= $_[2]; }
@@ -150,26 +161,42 @@ sub _pow { $_[1] **= $_[2]; }
 #  $_[1] = $_[1] << $_[2];
 #  }
 
+sub _gcd
+  {
+  $_[1] = Math::GMP::gcd_two($_[1],$_[2]);
+  }
+
+sub _fac
+  {
+  # factorial of $x
+  my ($c,$x) = @_;
+
+  my $n = _copy($c,$x);
+  $x = $one;
+  while (!_is_one($c,$n))
+    {
+    $x = Math::GMP::mul_two($x,$n); $n = Math::GMP::sub_two($n,$one);
+    }
+  $x; 
+  }
+
 ##############################################################################
 # _is_* routines
 
 sub _is_zero
   {
   # return true if arg is zero
-  return 1 if $_[1] == 0;
-  return 0;
+  $_[1] == $zero ? 1 : 0;
   }
 
 sub _is_one
   {
   # return true if arg is one
-  return 1 if $_[1] == 1;
-  return 0;
+  $_[1] == $one ? 1 : 0;
   }
 
-sub _is_even { $_[1] % 2 ? 0 : 1; }
-
-sub _is_odd { $_[1] % 2 ? 1 : 0; }
+sub _is_even { $_[1] % $two ? 0 : 1; }
+sub _is_odd { $_[1] % $two ? 1 : 0; }
 
 ###############################################################################
 # check routine to test internal state of corruptions
