@@ -12,11 +12,19 @@ require DynaLoader;
 
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 bootstrap Math::BigInt::GMP $VERSION;
 
 sub import { }		# catch and throw away
+
+sub api_version() { 1; }	# we are compatible with MBI v1.70 and up
+
+BEGIN
+  {
+  # noth _num and _str just return a string
+  *_str = \&_num;
+  }
 
 ##############################################################################
 # actual math code
@@ -71,6 +79,61 @@ sub _check
   return "$x is not a reference to Math::BigInt::GMP"
    if ref($x) ne 'Math::BigInt::GMP';
   0;
+  }
+
+sub _log_int1
+  {
+  }
+
+sub _log_int
+  {
+  my ($c,$x,$base) = @_;
+
+  # X == 0 => NaN
+  return if _is_zero($c,$x);
+  # BASE 0 or 1 => NaN
+  return if _is_zero($c,$base) || _is_one($c,$base);
+
+  my $cmp = _acmp($c,$x,$base); 	# X == BASE => 1
+  if ($cmp == 0)
+    {
+    # return one
+    return (_one($c), 1);
+    }
+  # X < BASE
+  if ($cmp < 0)
+    {
+    return (_zero($c),undef);
+    }
+
+  my $trial = _copy($c,$base);
+  my $x_org = _copy($c,$x);
+  $x = _one($c);
+
+  my $a;
+  my $base_mul = _mul($c, _copy($c,$base), $base);
+  my $two = _two($c);
+
+  while (($a = _acmp($c, $trial, $x_org)) < 0)
+    {
+    _mul($c,$trial,$base_mul); _add($c, $x, $two);
+    }
+
+  my $exact = 1;
+  if ($a > 0)
+    {
+    # overstepped the result
+    _dec($c, $x);
+    _div($c,$trial,$base);
+    $a = _acmp($c,$trial,$x_org);
+    if ($a > 0)
+      {
+      _dec($c, $x);
+      }
+    $exact = 0 if $a != 0;
+    }
+
+  return ($x,$exact);
   }
 
 1;

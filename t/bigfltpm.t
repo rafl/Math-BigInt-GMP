@@ -6,11 +6,10 @@ use strict;
 BEGIN
   {
   $| = 1;
-  unshift @INC, '../lib'; # for running manually
-  unshift @INC, './t'; # to locate the testing files
+  unshift @INC, '../lib'; 	# for running manually
   unshift @INC, '../blib/arch';
-  # chdir 't' if -d 't';
-  plan tests => 1772;
+  chdir 't' if -d 't';
+  plan tests => 1814;
   }
 
 use Math::BigInt lib => 'GMP';

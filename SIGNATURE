@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.36.
+signed via the Module::Signature module, version 0.38.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,33 +14,33 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 
 SHA1 51d611e269430c79a8db4a7bc398194137590a77 BUGS
-SHA1 e28242e0a24727e8f99a18be17b71daa3559b7cf CHANGES
+SHA1 f09a7a6ce498d6d38632091a3d6a89b3f6344b38 CHANGES
 SHA1 dda5ca4f413031e9efcaa1600461d5e2adaa3a40 CREDITS
-SHA1 eef2a9c7bc5fed8710d369f440a716a6243b3b5f GMP.xs
+SHA1 6fe0fa47b83f33ece3bb203ba1f31a267bd69653 GMP.xs
 SHA1 1c219a49ee07891ca39de3f89ce4bbe02549af82 INSTALL
 SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
 SHA1 402312551dc318b81e4b019598f0a554a30ad19e MANIFEST
-SHA1 f9bdfc620623b408d5a7b6cf134314b0610406aa META.yml
-SHA1 ec90e5841a9f9da08949fe05fd831b0cb35d477e Makefile.PL
-SHA1 61cb80d3717da3868137d55d77564466b93dc3c3 NEW
+SHA1 431df587e330be158703a915c2789a4fa43015d5 META.yml
+SHA1 10fa6e4c5db220c44db64c5e61e56e77ae85780b Makefile.PL
+SHA1 491645744c242a138417abff6d17cccec69dcb4c NEW
 SHA1 e9de29b6e5e9a5e446231b5b12b644f6ed2caafc README
-SHA1 a1bc7e739b95e31791e9cca711364fae97804e03 TODO
-SHA1 d381ac6055c6fc2c187831ca25ce750f214b6ff6 lib/Math/BigInt/GMP.pm
-SHA1 405dba0119ac22f5faaea780b14c7659a14421fd t/bigfltpm.inc
-SHA1 dc4d6f403f1a1c7609d5ea03774b812aa5d8df90 t/bigfltpm.t
-SHA1 3e310c9918c7a10b6a7f712de8970328ab1ac120 t/bigintg.t
-SHA1 24a9b7395ffc8f73873813c7732fb5711d45f30f t/bigintpm.inc
-SHA1 be40e8b6e64d587300758eb61b45fc254c938a6b t/bigintpm.t
+SHA1 e4fd0b099ed6ef332c72cbf85719a7cf1bd2dc6a TODO
+SHA1 5e5f59fa08aadff8c56e0b923d50490a7dd58170 lib/Math/BigInt/GMP.pm
+SHA1 c4984fb7f8115f76e747f247dd5723bae34de234 t/bigfltpm.inc
+SHA1 3a1d6a19d6717e8b4e29772bf978e75d6d02e7b3 t/bigfltpm.t
+SHA1 0b3ab9f29ca2712919701092ac05a62b83c8a4ee t/bigintg.t
+SHA1 936b543494219ebe6709968dea7a09b4b7146297 t/bigintpm.inc
+SHA1 51602dea2be35c9d7156f074ad748cf4dfdddca8 t/bigintpm.t
 SHA1 f7aad87c0a30330d474f4fb45f6d1953d6701d2f typemap
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.2-rc1-SuSE (GNU/Linux)
 Comment: When cryptography is outlawed, bayl bhgynjf jvyy unir cevinpl.
 
-iQEVAwUBQAFhWXcLPEOTuEwVAQGa6Af+JX+029fAvMciapPDc6LJEuoTRE9dOIbj
-TTOOQstXIAB/fSV+X87sijtLJ5sOYCxKZ8zh/78tBb6FwT7ozdLNIdrqVtUiwanI
-z6NJSf6V4HpZ8873Fd8UZlUbzdUdTbE8W1jyRn56LJcsgWTGsW1mtQdIZpXq/6Qr
-q+SyFDRRN+sghZtfD2CV5IMV8aM66s/hJPXg872OZEDFuNVE0O5wQhEcuLkLyQ7H
-Q1dDayNXrlWsqjX7MiebUYFgiuyuncOBHEE2ttkGrX/XoNjE7CMgDrnPBmclYxua
-albay+KDxbpbTYt3NTmW6V+BSb5oJd7TWiW5N0qEKxd/nope0cRSSA==
-=Nzv1
+iQEVAwUBQFHi03cLPEOTuEwVAQEyWAf+MyoTYAjRSDpunPdcvTkM98ETYrWUH9iB
+uZ+VdHkO8OpTFShoafJpDoN2rqqVdcvajWh9cnA1wAGwAZDhIcMZSrhyqaguCeA9
+nSbCQRU3ykOyAckQqW0PwO4I+gd/P9zt/1Nm1ldTtaWMEhUIoEm8d+axVoCszONL
+eEuClohmooZHKA3uLC64xqc0mIiOhpVU+AYds01EnxF+/Ih9oJt5MpzGQ02dvYIf
+Q1dT4nBJsdF/CGykP0QDECenAeiI1szhZ+7hDbmMzL47iqljdbfGJKk976er0uWK
+58rD9P7lgVTH6ecxHJKLbdV5qZTvXnrtbYgrOtlzXsBHm9gK07o8LA==
+=JEzB
 -----END PGP SIGNATURE-----

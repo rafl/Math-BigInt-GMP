@@ -124,6 +124,12 @@
     _xor, _sqrt, _root and _sub (sub in non-reversed form), this removes some
     malloc/free and makes these ops slightly faster
     (between 10 and 33% in Math::BigInt (!), depending on input and size)
+2004-02-15 v1.14 Tels 4867 tests
+  * require BigInt v1.70, use tests from it and make API compatible with it
+  * _rsft() and _lsft() modify their argument instead of making a copy,
+    meaning brsft() and blsft() got about 20% faster in BigInt
+  * added a working _zeros() method
+  * added a working _log_int() method
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

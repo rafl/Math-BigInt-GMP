@@ -30,13 +30,10 @@ mpz_t *
 _new(class,x)
 	SV*	class
 	SV*	x
-  INIT:
-    SV* s;
 
   CODE:
-    s = (SV*)SvRV(x);			/* ref to string, don't check ref */
     NEW_GMP_MPZ_T;
-    mpz_init_set_str(*RETVAL, SvPV_nolen(s), 0);
+    mpz_init_set_str(*RETVAL, SvPV_nolen(x), 0);
   OUTPUT:
     RETVAL
 
@@ -47,13 +44,10 @@ mpz_t *
 _from_bin(class,x)
 	SV*	class
 	SV*	x
-  INIT:
-    SV* s;
 
   CODE:
-    s = (SV*)SvRV(x);			/* ref to string, don't check ref */
     NEW_GMP_MPZ_T;
-    mpz_init_set_str(*RETVAL, SvPV_nolen(s), 0);
+    mpz_init_set_str(*RETVAL, SvPV_nolen(x), 0);
   OUTPUT:
     RETVAL
 
@@ -64,13 +58,10 @@ mpz_t *
 _from_hex(class,x)
 	SV*	class
 	SV*	x
-  INIT:
-    SV* s;
 
   CODE:
-    s = (SV*)SvRV(x);			/* ref to string, don't check ref */
     NEW_GMP_MPZ_T;
-    mpz_init_set_str(*RETVAL, SvPV_nolen(s), 0);
+    mpz_init_set_str(*RETVAL, SvPV_nolen(x), 0);
   OUTPUT:
     RETVAL
 
@@ -99,6 +90,33 @@ _one(class)
     mpz_init_set_ui(*RETVAL, 1);
   OUTPUT:
     RETVAL
+
+##############################################################################
+# _two()
+
+mpz_t *
+_two(class)
+	SV* class
+
+  CODE:
+    NEW_GMP_MPZ_T;
+    mpz_init_set_ui(*RETVAL, 2);
+  OUTPUT:
+    RETVAL
+
+##############################################################################
+# _ten()
+
+mpz_t *
+_ten(class)
+	SV* class
+
+  CODE:
+    NEW_GMP_MPZ_T;
+    mpz_init_set_ui(*RETVAL, 10);
+  OUTPUT:
+    RETVAL
+
 
 ##############################################################################
 # DESTROY() - free memory of a GMP number
@@ -136,36 +154,48 @@ _num(class, n)
       len --;				/* got one shorter than expected */
       }
     SvCUR_set(RETVAL, len); 		/* so set real length */
-  OUTPUT:
-    RETVAL
+   OUTPUT:
+     RETVAL
 
 ##############################################################################
-# __str() - return ref to string
-
-SV *
-_str(class,n)
+# _zeros() - return string
+#
+int
+_zeros(class,n)
 	SV*	class
 	mpz_t*	n
 
   PREINIT:
-    int len;
+    SV*	TEMP;
+    int len, zeros;
     char *buf;
     char *buf_end;
 
   CODE:
     /* len is always >= 1, and might be off (greater) by one than real len */
     len = mpz_sizeinbase(*n, 10);
-    RETVAL = newSV(len);		/* alloc len +1 bytes */
-    SvPOK_on(RETVAL);			/* make an PV */
-    buf = SvPVX(RETVAL);		/* get ptr to storage */ 
+    TEMP = newSV(len);			/* alloc len +1 bytes */
+    SvPOK_on(TEMP);			/* make an PV */
+    buf = SvPVX(TEMP);			/* get ptr to storage */ 
     buf_end = buf + len - 1;		/* end of storage (-1)*/
     mpz_get_str(buf, 10, *n);		/* convert to decimal string */
+    RETVAL = 0;
     if (*buf_end == 0)
       {
+      buf_end--;			/* ptr to last real digit */
       len --;				/* got one shorter than expected */
       }
-    SvCUR_set(RETVAL, len); 		/* so set real length */
-    RETVAL = newRV_noinc(RETVAL);	/* return ref to string */
+    if (len > 1)			/* '0' has not trailing zeross! */
+      {
+      while (len-- > 0)
+        {
+        if (*buf_end-- != '0')
+  	  {
+          break;
+	  }
+        RETVAL++;
+        }
+      }
   OUTPUT:
     RETVAL
 
@@ -190,7 +220,6 @@ _as_hex(class,n)
     *buf++ = '0'; *buf++ = 'x';		/* prepend '0x' */
     mpz_get_str(buf, 16, *n);		/* convert to hexadecimal string */
     SvCUR_set(RETVAL, len); 		/* so set real length */
-    RETVAL = newRV_noinc(RETVAL);	/* return ref to string */
   OUTPUT:
     RETVAL
 
@@ -215,7 +244,6 @@ _as_bin(class,n)
     *buf++ = '0'; *buf++ = 'b';		/* prepend '0b' */
     mpz_get_str(buf, 2, *n);		/* convert to binary string */
     SvCUR_set(RETVAL, len); 		/* so set real length */
-    RETVAL = newRV_noinc(RETVAL);	/* return ref to string */
   OUTPUT:
     RETVAL
 
@@ -362,32 +390,30 @@ sub_two(m,n)
 ##############################################################################
 # _rsft()
 
-mpz_t *
+void
 _rsft(class,x,y,base_sv)
 	SV*	class
-	mpz_t*	x
-	mpz_t*	y
+	SV*	x
+	SV*	y
 	SV*	base_sv
   PREINIT:
 	unsigned long	y_ui;
 	mpz_t*	TEMP;
+	mpz_t*	TEMP_1;
 	mpz_t*	BASE;
 
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    TEMP = malloc (sizeof(mpz_t));
-    mpz_init(*TEMP);
-    y_ui = mpz_get_ui(*y);
+  PPCODE:
+    GMP_GET_ARGS_0_1;	/* (TEMP, TEMP_1) = (x,y)  */
+
+    y_ui = mpz_get_ui(*TEMP_1);
     BASE = malloc (sizeof(mpz_t));
     mpz_init_set_ui(*BASE,SvUV(base_sv));
-    mpz_pow_ui(*TEMP, *BASE, y_ui); /* ">> 3 in base 4" => "x / (4 ** 3)" */
-    mpz_div(*RETVAL, *x, *TEMP);
-    mpz_clear(*TEMP);
-    free(TEMP);
+
+    mpz_pow_ui(*BASE, *BASE, y_ui); /* ">> 3 in base 4" => "x / (4 ** 3)" */
+    mpz_div(*TEMP, *TEMP, *BASE);
     mpz_clear(*BASE);
     free(BASE);
-  OUTPUT:
-    RETVAL
+    PUSHs( x );
 
 ##############################################################################
 # _lsft()
@@ -395,29 +421,27 @@ _rsft(class,x,y,base_sv)
 mpz_t *
 _lsft(class,x,y,base_sv)
 	SV*	class
-	mpz_t*	x
-	mpz_t*	y
+	SV*	x
+	SV*	y
 	SV*	base_sv
   PREINIT:
 	unsigned long	y_ui;
 	mpz_t*	TEMP;
+	mpz_t*	TEMP_1;
 	mpz_t*	BASE;
 
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    TEMP = malloc (sizeof(mpz_t));
-    mpz_init(*TEMP);
-    y_ui = mpz_get_ui(*y);
+  PPCODE:
+    GMP_GET_ARGS_0_1;	/* (TEMP, TEMP_1) = (x,y)  */
+
+    y_ui = mpz_get_ui(*TEMP_1);
     BASE = malloc (sizeof(mpz_t));
     mpz_init_set_ui(*BASE,SvUV(base_sv));
-    mpz_pow_ui(*TEMP, *BASE, y_ui); /* ">> 3 in base 4" => "x / (4 ** 3)" */
-    mpz_mul(*RETVAL, *x, *TEMP);
-    mpz_clear(*TEMP);
-    free(TEMP);
+
+    mpz_pow_ui(*BASE, *BASE, y_ui); /* "<< 3 in base 4" => "x * (4 ** 3)" */
+    mpz_mul(*TEMP, *TEMP, *BASE);
     mpz_clear(*BASE);
     free(BASE);
-  OUTPUT:
-    RETVAL
+    PUSHs ( x );
 
 ##############################################################################
 # _mul()
@@ -528,6 +552,34 @@ _is_one(class,x)
 
   CODE:
     RETVAL = mpz_cmp_ui(*x, 1);
+    if ( RETVAL != 0) { RETVAL = 0; } else { RETVAL = 1; }
+  OUTPUT:
+    RETVAL
+
+##############################################################################
+# _is_two()  
+
+int
+_is_two(class,x)
+	SV*	class
+	mpz_t *	x
+
+  CODE:
+    RETVAL = mpz_cmp_ui(*x, 2);
+    if ( RETVAL != 0) { RETVAL = 0; } else { RETVAL = 1; }
+  OUTPUT:
+    RETVAL
+
+##############################################################################
+# _is_ten()  
+
+int
+_is_ten(class,x)
+	SV*	class
+	mpz_t *	x
+
+  CODE:
+    RETVAL = mpz_cmp_ui(*x, 10);
     if ( RETVAL != 0) { RETVAL = 0; } else { RETVAL = 1; }
   OUTPUT:
     RETVAL

@@ -1,85 +1,11 @@
 
 Changes between the last and this version:
 
-v1.13:
-  * tests from BigInt v1.68
-  * removed DESTROY from GMP.pm and made GMP.xs destroy => DESTROY
-  * removed _num from GMP.pm and made GMP.xs __stringify => _num
-  * removed _modinv() from GMP.pm and fixed up _modinv in GMP.xs
-  * disabled the borken _log_int() from the XS code
-  * modify $x in place for _dec, _inc, _add, _mod, _mul, _fac, _and, _or,
-    _xor, _sqrt, _root and _sub (sub in non-reversed form), this removes some
-    malloc/free and makes these ops slightly faster (see benchmark below)
-
-Benchmark below run under Perl v5.8.2, 2 Ghz AMD Athlon, Linux 2.4.20,
-i, z and u are numbers with 1000 digits:
-
-v1.12:
-add(12,23):       6s (5.24 usr +  0.00 sys =  5.24 CPU) @ 26403/s (n=138352)
-add(copy(i),23):  5s (5.22 usr +  0.00 sys =  5.22 CPU) @ 25502/s (n=133122)
- add(z,23):       6s (5.25 usr +  0.00 sys =  5.25 CPU) @ 45080/s (n=236675)
-   dec($u):       5s (5.25 usr +  0.00 sys =  5.25 CPU) @ 52128/s (n=273677)
-   inc(12):       5s (5.25 usr +  0.00 sys =  5.25 CPU) @ 61264/s (n=321640)
-
-mul(12,23):       5s (5.24 usr +  0.00 sys =  5.24 CPU) @ 25895/s (n=135692)
-mul(23,12):       6s (5.24 usr +  0.00 sys =  5.24 CPU) @ 25893/s (n=135682)
-mul(copy(i),23):  5s (5.26 usr +  0.00 sys =  5.26 CPU) @ 24839/s (n=130656)
-
-sub(12,23):       5s (5.26 usr +  0.00 sys =  5.26 CPU) @ 18825/s (n=99022)
-sub(23,12):       5s (5.29 usr +  0.00 sys =  5.29 CPU) @ 19174/s (n=101433)
-sub(copy(i),23):  5s (5.08 usr +  0.11 sys =  5.19 CPU) @ 18654/s (n=96817)
- 
- mod(23,3):       4s (5.20 usr +  0.00 sys =  5.20 CPU) @ 37239/s (n=193645)
-mod(copy(23),12): 5s (5.23 usr +  0.00 sys =  5.23 CPU) @ 22206/s (n=116141)
-pow(1,123):       5s (5.27 usr +  0.00 sys =  5.27 CPU) @ 43363/s (n=228526)
-pow(copy(2),23):  5s (5.19 usr +  0.00 sys =  5.19 CPU) @ 25174/s (n=130656)
-
-fac(copy(12)):    5s (5.24 usr +  0.00 sys =  5.24 CPU) @ 32060/s (n=167999)
-fac(copy(122)):   5s (5.14 usr +  0.00 sys =  5.14 CPU) @ 26621/s (n=136834)
-
-and(12,23):       5s (5.24 usr +  0.00 sys =  5.24 CPU) @ 26598/s (n=139377)
-and(copy(i),23):  5s (5.17 usr +  0.00 sys =  5.17 CPU) @ 25994/s (n=134390)
-
-sqrt(copy(144)):  5s (5.14 usr +  0.00 sys =  5.14 CPU) @ 29601/s (n=152150)
-
-
-v1.13:
-add(12,23):       6s (5.13 usr +  0.09 sys =  5.22 CPU) @ 29145/s (n=152141)
-add(copy(i),23):  5s (5.20 usr +  0.00 sys =  5.20 CPU) @ 28715/s (n=149323)
- add(z,23):       6s (5.28 usr +  0.00 sys =  5.28 CPU) @ 58741/s (n=310153)
-   dec($u):       5s (5.19 usr +  0.00 sys =  5.19 CPU) @ 69717/s (n=361836)
-   inc(12):       5s (5.25 usr +  0.00 sys =  5.25 CPU) @ 82707/s (n=434215)
-
-mul(12,23):       4s (5.31 usr +  0.00 sys =  5.31 CPU) @ 28653/s (n=152150)
-mul(23,12):       5s (5.21 usr +  0.00 sys =  5.21 CPU) @ 28662/s (n=149333)
-mul(copy(i),23):  4s (5.22 usr +  0.00 sys =  5.22 CPU) @ 27725/s (n=144728)
-
-sub(12,23):       5s (5.27 usr +  0.00 sys =  5.27 CPU) @ 19125/s (n=100790)
-sub(23,12):       5s (5.26 usr +  0.00 sys =  5.26 CPU) @ 20637/s (n=108553)
-sub(copy(i),23):  6s (5.24 usr +  0.00 sys =  5.24 CPU) @ 20323/s (n=106495)
-
- mod(23,3):       5s (5.29 usr +  0.00 sys =  5.29 CPU) @ 44740/s (n=236675)
-mod(copy(23),12): 6s (5.20 usr +  0.00 sys =  5.20 CPU) @ 24222/s (n=125990)
-pow(1,123):       5s (5.32 usr +  0.00 sys =  5.32 CPU) @ 53386/s (n=284015)
-pow(copy(2),23):  6s (5.24 usr +  0.00 sys =  5.24 CPU) @ 27621/s (n=144738)
-
-fac(copy(12)):    4s (5.17 usr +  0.00 sys =  5.17 CPU) @ 36093/s (n=186604)
-fac(copy(122)):   5s (5.24 usr +  0.00 sys =  5.24 CPU) @ 29593/s (n=155071)
-
-and(12,23):       5s (5.17 usr +  0.00 sys =  5.17 CPU) @ 29994/s (n=155071)
-and(copy(i),23):  6s (5.29 usr +  0.00 sys =  5.29 CPU) @ 29314/s (n=155076
-
-sqrt(copy(144)):  5s (5.29 usr +  0.00 sys =  5.29 CPU) @ 32333/s (n=171045)
-
-The times are for BigInt operations, not for Math::BigInt::GMP, e.g. they
-represent what the end-user would really see in practical applications.
-
-Adding two small numbers, or making a copy of a big number and adding a small
-one are about 10% faster, modifying a big number in place by adding a small
-number, as well as decrementing/incrementing a big/small one are now about
-33% faster.
-
-For mul and sub the speed-ups are not so big, about 5-10% depending on input.
-
-Thanx go to the perl-xs mailing list for help, especially Nick Ing-Simmons! 
+v1.14:
+  * tests from BigInt v1.70
+  * we are compatible with API form BigInt v1.70
+  * _rsft() and _lsft() modify their argument instead of making a copy,
+    meaning brsft() and blsft() got about 20% faster in BigInt
+  * added a working _zeros() method
+  * added a working _log_int() method
 
