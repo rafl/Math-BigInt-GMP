@@ -47,6 +47,19 @@
   * tests from Math::BigInt v1.50
   * bypass Math::GMP's overload interface and use Math::GMP::gmp_foo() directly
   * added _gcd() and _fac() for more speed in bgcd() and bfac(), respectively
+2002-02-16 v1.05 Tels
+  * tests from Math::BigInt v1.1
+  * replaced _core_lib() by config()->{lib}
+  * added _and, _or, _xor (using Math::GMP internal methods)
+  * switched _fac over to use Math::GMP gmp_fac()
+  * added _sqrt() using gmp_sqrt()
+  * used div_two and bdiv_two for _div()
+  * tests for _div() in list context and _mod
+
+  The speedups in band(), bxor(), bior() and bfac() are at least factor 10 for
+  small numbers and quickly raise as the numbers grow ;)
+  The speedup for bmod() and bdiv() aren't that dramatic, but still worth the
+  change. 
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

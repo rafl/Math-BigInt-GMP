@@ -6,9 +6,9 @@ use Test;
 BEGIN 
   {
   $| = 1;
-  # chdir 't' if -d 't';
+  chdir 't' if -d 't';
   unshift @INC, '../lib'; # for running manually
-  plan tests => 59;
+  plan tests => 65;
   }
 
 # testing of Math::BigInt::GMP, primarily for interface/api and not for the
@@ -18,25 +18,37 @@ use Math::BigInt::GMP;
 
 my $C = 'Math::BigInt::GMP';	# pass classname to sub's
 
+my ($x,$y,$r,$z);
+
 # _new and _str
-my $x = $C->_new(\"123"); my $y = $C->_new(\"321");
+$x = $C->_new(\"123"); $y = $C->_new(\"321");
 ok (ref($x),'Math::GMP'); ok (${$C->_str($x)},123); ok (${$C->_str($y)},321);
 
 # _add, _sub, _mul, _div
-
 ok (${$C->_str($C->_add($x,$y))},444);
 ok (${$C->_str($C->_sub($x,$y))},123);
+print "mul\n";
 ok (${$C->_str($C->_mul($x,$y))},39483);
 ok (${$C->_str($C->_div($x,$y))},123);
 
+print "x ok\n";
 ok (${$C->_str($C->_mul($x,$y))},39483);
+print "xy ok\n";
 ok (${$C->_str($x)},39483);
 ok (${$C->_str($y)},321);
-my $z = $C->_new(\"2");
+$z = $C->_new(\"2");
 ok (${$C->_str($C->_add($x,$z))},39485);
 my ($re,$rr) = $C->_div($x,$y);
 
 ok (${$C->_str($re)},123); ok (${$C->_str($rr)},2);
+
+# _mod, _div in list context
+$x = $C->_new(\"124"); $y = $C->_new(\"3");
+ok (${$C->_str($C->_mod($x,$y))},1);
+
+$x = $C->_new(\"124"); ($z,$r) = $C->_div($x,$y);
+ok (${$C->_str($z)},41);
+ok (${$C->_str($r)},1);
 
 # is_zero, _is_one, _one, _zero
 ok ($C->_is_zero($x),0);
@@ -75,15 +87,14 @@ $x = $C->_new(\"123"); $y = $C->_new(\"1111");
 ($x,$y) = $C->_div($x,$y); ok (${$C->_str($x)},0); ok (${$C->_str($y)},123);
 
 # _and, _xor, _or
-#$x = $C->_new(\"7"); $y = $C->_new(\"5"); ok (${$C->_str($C->_and($x,$y))},5);
-#$x = $C->_new(\"6"); $y = $C->_new(\"1"); ok (${$C->_str($C->_or($x,$y))},7);
-#$x = $C->_new(\"9"); $y = $C->_new(\"6"); ok (${$C->_str($C->_xor($x,$y))},15);
+$x = $C->_new(\"7"); $y = $C->_new(\"5"); ok (${$C->_str($C->_and($x,$y))},5);
+$x = $C->_new(\"6"); $y = $C->_new(\"1"); ok (${$C->_str($C->_or($x,$y))},7);
+$x = $C->_new(\"9"); $y = $C->_new(\"6"); ok (${$C->_str($C->_xor($x,$y))},15);
 
 # _dec, _inc
 $x = $C->_new(\"7"); ok (${$C->_str($C->_inc($x))},8);
 $x = $C->_new(\"7"); ok (${$C->_str($C->_dec($x))},6);
 
-my $r;
 # to check bit-counts
 foreach (qw/
   7:7:823543 

@@ -12,11 +12,10 @@ require Exporter;
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
         
 # todo: _from_hex _from_bin
 #       _as_hex _as_bin
-#	_and _or _xor
 
 use Math::GMP;
 
@@ -35,6 +34,13 @@ sub _new
   Math::GMP::new_from_scalar($$d);
   }                                                                             
 
+sub _from_hex
+  {
+  # (hex string) return ref to num
+  my $d = $_[1];
+  Math::GMP::new_from_scalar($$d);
+  }                                                                             
+
 sub _zero
   {
   Math::GMP::new_from_scalar(0);
@@ -48,7 +54,8 @@ sub _one
 sub _copy
   {
   # return Math::GMP->new("$_[1]");	# this is O(N*N)
-  $_[1]+0;				# this should be O(N)	
+  Math::GMP::gmp_copy($_[1]);
+#  $_[1]+0;				# this should be O(N)	
 #  $_[1];		# Math::GMP::gmp_foo() already makes copy in every case
   }
 
@@ -75,7 +82,6 @@ sub _num
 ##############################################################################
 # actual math code
 
-#sub _add { $_[1] += $_[2]; }
 sub _add { $_[1] = Math::GMP::add_two($_[1],$_[2]); }
 
 sub _sub
@@ -84,39 +90,37 @@ sub _sub
   if ($_[3])
     {
     $_[2] = Math::GMP::sub_two($_[1],$_[2]); return $_[2];
-   # $_[2] = $_[1] - $_[2]; return $_[2];
     }
-#  else
-#    {
    $_[1] = Math::GMP::sub_two($_[1],$_[2]); return $_[1];
-#    $_[1] -= $_[2]; return $_[1];
-#    }
   }                                                                             
 
-#sub _mul { $_[1] *= $_[2]; }
+# Does not work yet
+#BEGIN
+#  {
+#  *_mul = \&Math::GMP::mul_two_fast;
+#  }
+
 sub _mul { $_[1] = Math::GMP::mul_two($_[1],$_[2]); }
 
-#sub _mod { $_[1] %= $_[2]; }
 sub _mod { $_[1] = Math::GMP::mod_two($_[1],$_[2]); }
 
-sub _div {
-    if (wantarray) {
-        my $r = $_[1] % $_[2];
-        $_[1] /= $_[2];
-        return($_[1], $r);
-    } else {
-        $_[1] /= $_[2];
+sub _div
+  {
+  if (wantarray)
+    {
+    my $r;
+    ($_[1],$r) = Math::GMP::bdiv_two($_[1],$_[2]); 
+    return ($_[1], $r);
     }
-    $_[1];
-}
+  $_[1] = Math::GMP::div_two($_[1],$_[2]);
+  }
 
 sub _inc { $_[1] = Math::GMP::add_two($_[1],$one); }
 sub _dec { $_[1] = Math::GMP::sub_two($_[1],$one); }
 
-# does not work
-#sub _and { $_[1] &= $_[2]; }
-#sub _xor { $_[1] ^= $_[2]; }
-#sub _or  { $_[1] |= $_[2]; }
+sub _and { $_[1] = Math::GMP::and_two($_[1],$_[2]); }
+sub _xor { $_[1] = Math::GMP::xor_two($_[1],$_[2]); }
+sub _or  { $_[1] = Math::GMP::or_two($_[1],$_[2]); }
 
 ##############################################################################
 # testing
@@ -146,7 +150,6 @@ sub _digit
 
 sub _pow { $_[1] **= $_[2]; }
 
-# does not work
 #sub _rsft
 #  {
 #  # (X,Y,N) = @_; means X >> Y in base N
@@ -166,7 +169,17 @@ sub _gcd
   $_[1] = Math::GMP::gcd_two($_[1],$_[2]);
   }
 
+sub _sqrt
+  {
+  $_[1] = Math::GMP::gmp_sqrt($_[1]);
+  }
+
 sub _fac
+  {
+  $_[1] = Math::GMP::gmp_fac($_[1]);
+  }
+
+sub _fac_slow
   {
   # factorial of $x
   my ($c,$x) = @_;
@@ -195,8 +208,11 @@ sub _is_one
   $_[1] == $one ? 1 : 0;
   }
 
-sub _is_even { $_[1] % $two ? 0 : 1; }
-sub _is_odd { $_[1] % $two ? 1 : 0; }
+#sub _is_even { $_[1] % $two ? 0 : 1; }
+#sub _is_odd { $_[1] % $two ? 1 : 0; }
+
+sub _is_even { Math::GMP::gmp_tstbit($_[1],0) ? 0 : 1; }
+sub _is_odd { Math::GMP::gmp_tstbit($_[1],0) ? 1 : 0; }
 
 ###############################################################################
 # check routine to test internal state of corruptions
@@ -228,8 +244,8 @@ the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Tels http://bloodgate.com in 2001.
-The used module Math::GMP is by Chip Turner. Thanx!
+Tels <http://bloodgate.com/> in 2001-2002.
+The module Math::GMP is by Chip Turner. Thanx!
 
 =head1 SEE ALSO
 

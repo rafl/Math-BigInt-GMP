@@ -9,7 +9,7 @@ BEGIN
   unshift @INC, '../lib'; # for running manually
   unshift @INC, './t'; # to locate the testing files
   # chdir 't' if -d 't';
-  plan tests => 1555;
+  plan tests => 1585;
   }
 
 use Math::BigInt lib => 'GMP';
