@@ -1,0 +1,13 @@
+
+
+2001-07-22 v1.00: Tels
+ * First version (basically working with some quirks)
+2001-08-06 v1.01: Tels
+ * first release
+ * fixed all the bugs in v1.00
+ * taken over tests from BigInt v1.40
+ 
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

@@ -1,0 +1,12 @@
+CHANGES
+BUGS
+INSTALL
+README
+LICENSE
+MANIFEST
+TODO
+Makefile.PL
+lib/Math/BigInt/GMP.pm
+t/bigintg.t			# Math::GMP implementation of uint math core
+t/bigintpm.t			# original test, but with Math::GMP
+t/bigfltpm.t			# original test, but with Math::GMP 
