@@ -1,18 +1,27 @@
 
 Changes between the last and this version:
 
-v1.16:
-  * fixed a leak in _div() and simplified it (Thanx Tassilo v. Parseval)
-  * moved the _div() code to XS to make it a bit faster
-  * put leak.pl and leaktest into MANIFEST for later checking
+v1.17:
+  * use XSLoader instead of DynaLoader to save a tiny amount of memory
+  * take over tests from Math::BigInt v1.74
+  * require Math::BigInt v1.74
+  * simplify sub code in XS (left-over artifact from v1.16)
+  * fix a leak in _zeros()
+  * _zeros() is now much faster for odd numbers (O(1) vs. O(N*N))
 
 #############################################################################
 
-v1.15:
- 221 / 444:  5 wallclock secs ( 5.20 usr +  0.01 sys =  5.21 CPU) @ 18940/s (n=98679)
- 444 / 221:  6 wallclock secs ( 5.20 usr +  0.01 sys =  5.21 CPU) @ 19108/s (n=99555)
-
 v1.16:
- 221 / 444:  6 wallclock secs ( 5.24 usr +  0.01 sys =  5.25 CPU) @ 20957/s (n=110026)
- 444 / 221:  5 wallclock secs ( 5.28 usr +  0.00 sys =  5.28 CPU) @ 21231/s (n=112102)
+
+Benchmark: running zeros(1.0x1000), zeros(123), zeros(1x1000) for at least 5 CPU seconds...
+zeros(1.0x1000):  5s (5.02 usr +  0.15 sys =  5.17 CPU) @  14179/s (n=73309)
+zeros(123):  	  5s (5.19 usr +  0.11 sys =  5.30 CPU) @ 253584/s (n=1344000)
+zeros(1x1000):    5s (5.06 usr +  0.17 sys =  5.23 CPU) @  14106/s (n=73777)
+
+
+v1.17:
+Benchmark: running zeros(1.0x1000), zeros(123), zeros(1x1000) for at least 5 CPU seconds...
+zeros(1.0x1000):  5s (5.06 usr +  0.15 sys =  5.21 CPU) @  14160/s (n=73777)
+zeros(123):  	  5s (5.27 usr +  0.01 sys =  5.28 CPU) @ 299044/s (n=1578957)
+zeros(1x1000):    5s (5.21 usr +  0.01 sys =  5.22 CPU) @ 302482/s (n=1578957)
 

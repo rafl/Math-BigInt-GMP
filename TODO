@@ -1,7 +1,6 @@
 
 * _lsft() and _rsft() could probably be a bit more optimized
 * move _log_int() to XS
-* move sub() and div() completely to XS ?
 * _digit() and _len() could be more optimized
 * _zeros() could be more optimized (divide by 1e5, check for == 0?)
 * replace all malloc() with New() and all free() with Savefree()?

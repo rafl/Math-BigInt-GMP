@@ -140,6 +140,13 @@
   * fixed a leak in _div() (Thanx Tassilo v. Parsival!)
   * put _div() into XS, making division slightly faster for small numbers
   * put leak.pl and leaktest into MANIFEST for later checking
+2005-01-01 v1.17 Tels 5182 tests
+  * use XSLoader instead of DynaLoader to save a tiny amount of memory
+  * take over tests from Math::BigInt v1.74
+  * require Math::BigInt v1.74
+  * simplify sub code in XS (left-over artifact from v1.16)
+  * fix a leak in _zeros()
+  * _zeros() is now much faster for odd numbers (O(1) vs. O(N*N))
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

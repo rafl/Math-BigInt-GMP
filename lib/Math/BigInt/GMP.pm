@@ -7,14 +7,12 @@ use strict;
 use 5.005;
 # use warnings; # dont use warnings for older Perls
 
-require Exporter;
-require DynaLoader;
+use vars qw/$VERSION/;
 
-use vars qw/@ISA $VERSION/;
-@ISA = qw(Exporter DynaLoader);
-$VERSION = '1.16';
+$VERSION = '1.17';
 
-bootstrap Math::BigInt::GMP $VERSION;
+use XSLoader;
+XSLoader::load "Math::BigInt::GMP", $VERSION;
 
 sub import { }			# catch and throw away
 sub api_version() { 1; }	# we are compatible with MBI v1.70 and up

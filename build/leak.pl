@@ -29,11 +29,12 @@ for my $do (
   [ sub { my $z = $x; $z %= $y; 1; }, '%=' ],
   [ sub { my $z = $x; $z /= $y; 1; }, '/=' ],
   [ sub { my ($q,$r) = $x->copy()->bdiv($y); 1; }, '(q,r) = x / y' ],
+  [ sub { $x->_trailing_zeros(); }, '_zeros(x)' ],			# needs an even number!
  )
   {
   my $handle;
   my $count = Devel::Leak::NoteSV($handle);
-  for (1..10) { &{$do->[0]}; }
+  for (1..13) { &{$do->[0]}; }
   print "$do->[1] leaked ", Devel::Leak::CheckSV($handle) - $count, " things\n";
   }
 

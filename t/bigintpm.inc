@@ -778,7 +778,7 @@ inf:inf:NaN
 -inf:1
 NaNneg:0
 &is_positive
-0:1
+0:0
 -1:0
 1:1
 +inf:1

@@ -151,6 +151,10 @@ _num(Class, n)
 
 ##############################################################################
 # _zeros() - return number of trailing zeros (in decimal form)
+# This is costly, since it needs O(N*N) to convert the number to decimal,
+# even though for most cases the number does not have many trailing zeros.
+# For numbers longer than X digits (10?) we could divide repeatable by 1e5
+# or something and see if we get zeros.
 
 int
 _zeros(Class,n)
@@ -163,30 +167,37 @@ _zeros(Class,n)
     char *buf_end;
 
   CODE:
-    /* len is always >= 1, and might be off (greater) by one than real len */
-    len = mpz_sizeinbase(*n, 10);
-    TEMP = newSV(len);			/* alloc len +1 bytes */
-    SvPOK_on(TEMP);			/* make an PV */
-    buf = SvPVX(TEMP);			/* get ptr to storage */ 
-    buf_end = buf + len - 1;		/* end of storage (-1)*/
-    mpz_get_str(buf, 10, *n);		/* convert to decimal string */
-    RETVAL = 0;
-    if (*buf_end == 0)
+    /* odd numbers can not have trailing zeros */
+    RETVAL = 1 - mpz_tstbit(*n,0);
+
+    if (RETVAL != 0)			/* was even */
       {
-      buf_end--;			/* ptr to last real digit */
-      len --;				/* got one shorter than expected */
-      }
-    if (len > 1)			/* '0' has not trailing zeross! */
-      {
-      while (len-- > 0)
+      /* len is always >= 1, and might be off (greater) by one than real len */
+      len = mpz_sizeinbase(*n, 10);
+      TEMP = newSV(len);		/* alloc len +1 bytes */
+      SvPOK_on(TEMP);			/* make an PV */
+      buf = SvPVX(TEMP);		/* get ptr to storage */ 
+      buf_end = buf + len - 1;		/* end of storage (-1)*/
+      mpz_get_str(buf, 10, *n);		/* convert to decimal string */
+      RETVAL = 0;
+      if (*buf_end == 0)		/* points to terminating zero? */
         {
-        if (*buf_end-- != '0')
-  	  {
-          break;
-	  }
-        RETVAL++;
+        buf_end--;			/* ptr to last real digit */
+        len --;				/* got one shorter than expected */
         }
-      }
+      if (len > 1)			/* '0' has not trailing zeross! */
+        {
+        while (len-- > 0)		/* actually, we should hit a nonzero */
+          {				/* before the end */
+          if (*buf_end-- != '0')
+	    {
+	    break;
+	    }
+          RETVAL++;
+          }
+        }
+       SvREFCNT_dec(TEMP);		/* Bumpersticker: Free Temp! */
+     } /* end if n was even */
   OUTPUT:
     RETVAL
 
@@ -359,19 +370,13 @@ _sub(Class,x,y, ...)
   PREINIT:
         mpz_t* TEMP;
         mpz_t* TEMP_1;
-        mpz_t* TEMP_2;
   PPCODE:
     GMP_GET_ARGS_0_1;	/* (TEMP, TEMP_1) = (x,y)  */
     if ( items == 4 && SvTRUE(ST(3)) ) 
       {
-      /* return new(y - x) */ 
-      /* need to create TEMP_2 or it will ssegfault */
-      TEMP_2 = malloc (sizeof(mpz_t)); mpz_init(*TEMP_2);
-
-      mpz_sub(*TEMP_2, *TEMP, *TEMP_1);
-
-      PUSHs(sv_setref_pv(sv_newmortal(), "Math::BigInt::GMP", (void*)TEMP_2)); 
-      /*PUSHs(sv_setref_pv(y, "Math::BigInt::GMP", (void*)TEMP_2)); */ 
+      /* y -= x */ 
+      mpz_sub(*TEMP_1, *TEMP, *TEMP_1);
+      PUSHs( y );
       }
     else
       {

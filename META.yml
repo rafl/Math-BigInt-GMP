@@ -1,11 +1,11 @@
 --- #YAML:1.0
 name: Math-BigInt-GMP
-version: 1.16
+version: 1.17
 version_from: lib/Math/BigInt/GMP.pm
 license: perl
 distribution_type: module
-generated_by: Math-BigInt-GMP version 1.16
+generated_by: Math-BigInt-GMP version 1.17
 installdirs: site
 requires:
-  Math::BigFloat: 1.47
-  Math::BigInt: 1.73
+  Math::BigInt: 1.74
+  XSLoader: 0.02
