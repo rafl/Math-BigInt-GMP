@@ -101,6 +101,19 @@
   * documented in todo to replace all malloc()/free() with New and Safefree()
   * removed unused cmp_two() function in GMP.xs
   * removed the unused "$zero = ..."/"$one = ..." in GMP.pm
+2003-01-08 v1.12a Tels 4109 tests (not released)
+  * removed unused function _mmod from XS code
+  * removed unnecc. if len == 0 check in _as_bin(), _as_hex() etc
+  * replace some RETVAL = malloc() lines with defined to make changing them
+    later much easier
+2003-07-04 v1.12b Tels 4491 tests (not released)
+  * testsuite from v1.65
+  * fixed prereq to require BigInt v1.65
+2003-12-11 v1.12 Tels 4677 tests
+  * testsuite from v1.67, especialy revamped bigintg.t
+  * fixed prereq to require BigInt v1.67
+  * added _log_int() to XS code
+  * some routines did only return the result, but not modify $x in place
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

@@ -10,7 +10,7 @@ BEGIN
   unshift @INC, './t'; # to locate the testing files
   unshift @INC, '../blib/arch';
   # chdir 't' if -d 't';
-  plan tests => 1627;
+  plan tests => 1772;
   }
 
 use Math::BigInt lib => 'GMP';

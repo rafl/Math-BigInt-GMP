@@ -13,7 +13,7 @@ require DynaLoader;
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter DynaLoader);
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 bootstrap Math::BigInt::GMP $VERSION;
 
@@ -44,7 +44,7 @@ sub _sub
     {
     $_[2] = Math::BigInt::GMP::sub_two($_[1],$_[2]); return $_[2];
     }
-   $_[1] = Math::BigInt::GMP::sub_two($_[1],$_[2]); return $_[1];
+  $_[1] = Math::BigInt::GMP::sub_two($_[1],$_[2]);
   }                                                                             
 
 sub _div
@@ -145,7 +145,7 @@ the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Tels <http://bloodgate.com/> in 2001-2002.
+Tels <http://bloodgate.com/> in 2001-2003.
 
 Thanx to Chip Turner for providing Math::GMP, which was inspiring my work.
 

@@ -6,9 +6,11 @@ This package contains a replacement (drop-in) module for Math::BigInt's core,
 Math::BigInt::Calc.pm. It needs the new versions of Math::BigInt and
 Math::BigFloat as they are from Perl 5.7.x onwards.
 
+You need to install the Gnu MP library aka libgmp to compile this module.
+
 How to install (replace the version below with the current one):
 
-	tar -xzf Math-BigInt-GMP-1.10.tar.gz
+	tar -xzf Math-BigInt-GMP-1.12.tar.gz
 	cpansign --verify
 
 If the signature does not verify ok, you might to install Module::Signature
@@ -61,4 +63,4 @@ are available under:
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
 
-Tels <http://bloodgate.com/>
+(c) Tels 2001-2003 <http://bloodgate.com/>

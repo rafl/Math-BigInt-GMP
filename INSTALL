@@ -6,6 +6,8 @@ This package contains a replacement (drop-in) module for Math::BigInt's core,
 Math::BigInt::Calc.pm. It needs the new versions of Math::BigInt and
 Math::BigFloat as they are from Perl 5.7.x onwards.
 
+You need to install the Gnu MP library aka libgmp to compile this module.
+
 How to install:
 
 	perl Makefile.PL
@@ -20,6 +22,9 @@ To use it, replace:
 with this:
 
 	use Math::BigInt lib => 'GMP';
+
+Since Math::BigInt will fallback to a pure-perl implementation, it is safe
+to always use lib => 'GMP'.
 
 Please read the documentation under PERFORMANCE in Math::BigInt on when to
 use this module and when not.
