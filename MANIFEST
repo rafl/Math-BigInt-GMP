@@ -9,4 +9,7 @@ Makefile.PL
 lib/Math/BigInt/GMP.pm
 t/bigintg.t			# Math::GMP implementation of uint math core
 t/bigintpm.t			# original test, but with Math::GMP
+t/bigintpm.inc			# actual tests
 t/bigfltpm.t			# original test, but with Math::GMP 
+t/bigfltpm.inc			# actual tests
+t/Math/Subclass.pm

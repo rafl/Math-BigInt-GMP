@@ -9,7 +9,37 @@
 2001-09-02 v1.02: Tels
  * removed auto-export and added empty import()
  * taken over tests from BigInt v1.42
- 
+2001-11-01 v1.03: Tels
+ * taken over tests from BigInt v1.45 
+ * added _mod() for more speed for $x % $y
+
+	#!/usr/bin/perl -w
+	
+	use lib 'lib';
+	#use lib '../Math-BigInt-GMP-1.02/lib';
+	
+	use Math::BigInt lib => 'GMP';
+	use Benchmark;
+	
+	my $digits = 1024;
+	my $x = Math::BigInt->new('1' . '0' x $digits);
+	my $y = Math::BigInt->new('3' . '0' x ($digits - 2) . '3');
+	my $u = Math::BigInt->new('3');
+	
+	timethese ( 2000,
+	  {
+	  mod_l => sub { $z = $x % $y, },
+	  mod_s => sub { $z = $x % $u, },
+	  div_l => sub { ($z,$r) = $x->copy()->bdiv($y), },
+	  } );
+
+	On a 1 Ghz Athlon with v1.45 of BigInt in ops/s:
+
+		v1.02	v1.03
+	mod_s    1100	 2350 
+	mod_l    1111    2325
+	div_l    1260    1300
+
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
 

@@ -12,7 +12,7 @@ require Exporter;
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
         
 # todo: _from_hex _from_bin
 #       _as_hex _as_bin
@@ -71,7 +71,8 @@ sub _num
 ##############################################################################
 # actual math code
 
-sub _add { $_[1] += $_[2]; }                                                                             
+sub _add { $_[1] += $_[2]; }
+
 sub _sub
   {
   # $x is always larger than $y! So overflow/underflow can not happen here
@@ -85,7 +86,10 @@ sub _sub
     }
   }                                                                             
 
-sub _mul { $_[1] *= $_[2]; }                                                                             
+sub _mul { $_[1] *= $_[2]; }
+
+sub _mod { $_[1] %= $_[2]; }
+
 sub _div {
     if (wantarray) {
         my $r = $_[1] % $_[2];
@@ -97,9 +101,13 @@ sub _div {
     $_[1];
 }
 
-
 sub _inc { ++$_[1]; }
 sub _dec { --$_[1]; }
+
+# does not work
+#sub _and { $_[1] &= $_[2]; }
+#sub _xor { $_[1] ^= $_[2]; }
+#sub _or  { $_[1] |= $_[2]; }
 
 ##############################################################################
 # testing
@@ -126,6 +134,21 @@ sub _digit
   }
 
 sub _pow { $_[1] **= $_[2]; }
+
+# does not work
+#sub _rsft
+#  {
+#  # (X,Y,N) = @_; means X >> Y in base N
+#  return undef if $_[3] != 2;
+#  $_[1] = $_[1] >> $_[2];
+#  }
+#
+#sub _lsft
+#  {
+#  # (X,Y,N) = @_; means X >> Y in base N
+#  return undef if $_[3] != 2;
+#  $_[1] = $_[1] << $_[2];
+#  }
 
 ##############################################################################
 # _is_* routines

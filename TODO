@@ -1,5 +1,6 @@
 
 * _copy() could be faster, find native copy method
+# implement the missing methods
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
