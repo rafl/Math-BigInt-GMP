@@ -136,6 +136,10 @@
   * do not pull unused parameter "Class" from stack - avoid compiler warnings
   * put _sub() into XS for more speed and smaller memory footprint
   * testsuite from MBI v1.73
+2004-12-09 v1.16 Tels 5112 tests
+  * fixed a leak in _div() (Thanx Tassilo v. Parsival!)
+  * put _div() into XS, making division slightly faster for small numbers
+  * put leak.pl and leaktest into MANIFEST for later checking
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

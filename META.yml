@@ -1,12 +1,11 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Math-BigInt-GMP
-version:      1.15
+--- #YAML:1.0
+name: Math-BigInt-GMP
+version: 1.16
 version_from: lib/Math/BigInt/GMP.pm
-installdirs:  site
-requires:
-    Math::BigFloat:                1.47
-    Math::BigInt:                  1.73
-
+license: perl
 distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+generated_by: Math-BigInt-GMP version 1.16
+installdirs: site
+requires:
+  Math::BigFloat: 1.47
+  Math::BigInt: 1.73

@@ -9,6 +9,9 @@ NEW
 SIGNATURE
 TODO
 GMP.xs
+build/README
+build/leak.pl
+build/leaktest
 typemap
 Makefile.PL
 lib/Math/BigInt/GMP.pm

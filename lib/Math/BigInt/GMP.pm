@@ -12,12 +12,11 @@ require DynaLoader;
 
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter DynaLoader);
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 bootstrap Math::BigInt::GMP $VERSION;
 
-sub import { }		# catch and throw away
-
+sub import { }			# catch and throw away
 sub api_version() { 1; }	# we are compatible with MBI v1.70 and up
 
 BEGIN
@@ -26,21 +25,7 @@ BEGIN
   *_str = \&_num;
   }
 
-##############################################################################
-# actual math code (this could also be put into GMP.xs for more speed)
-
-sub _div
-  {
-  if (wantarray)
-    {
-    # return (a/b,a%b)
-    my $r;
-    ($_[1],$r) = Math::BigInt::GMP::bdiv_two($_[1],$_[2]); 
-    return ($_[1], $r);
-    }
-  # return a / b
-  $_[1] = Math::BigInt::GMP::div_two($_[1],$_[2]);
-  }
+# Routines not present here are in GMP.xs
 
 ##############################################################################
 # testing
@@ -119,7 +104,7 @@ sub _log_int
     $exact = 0 if $a != 0;
     }
 
-  return ($x,$exact);
+  ($x,$exact);
   }
 
 1;

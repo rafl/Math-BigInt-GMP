@@ -150,7 +150,7 @@ _num(Class, n)
      RETVAL
 
 ##############################################################################
-# _zeros() - return string
+# _zeros() - return number of trailing zeros (in decimal form)
 
 int
 _zeros(Class,n)
@@ -370,8 +370,8 @@ _sub(Class,x,y, ...)
 
       mpz_sub(*TEMP_2, *TEMP, *TEMP_1);
 
-      /* PUSHs(sv_setref_pv(sv_newmortal(), "Math::BigInt::GMP", (void*)TEMP_2)); */
-      PUSHs(sv_setref_pv(y, "Math::BigInt::GMP", (void*)TEMP_2));
+      PUSHs(sv_setref_pv(sv_newmortal(), "Math::BigInt::GMP", (void*)TEMP_2)); 
+      /*PUSHs(sv_setref_pv(y, "Math::BigInt::GMP", (void*)TEMP_2)); */ 
       }
     else
       {
@@ -450,44 +450,50 @@ _mul(Class,x,y)
     PUSHs( x );
 
 ##############################################################################
-# _div_two()
-
-mpz_t *
-div_two(m,n)
-	mpz_t *		m
-	mpz_t *		n
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    mpz_div(*RETVAL, *m, *n);
-  OUTPUT:
-    RETVAL
-
-
-##############################################################################
-# _bdiv_two()
+# _div(): x /= y or (x,rem) = x / y
+# was in perl:
+#sub _div
+#  {
+#  i f (wantarray)
+#    {
+#    # return (a/b,a%b)
+#    my $r;
+#    ($_[1],$r) = Math::BigInt::GMP::bdiv_two($_[1],$_[2]);
+#    return ($_[1], $r);
+#    }
+#  # return a / b
+#  Math::BigInt::GMP::div_two($_[1],$_[2]);
+#  }
 
 void
-bdiv_two(m,n)
-	mpz_t *		m
-	mpz_t *		n
-
+_div(Class,x,y)
+        SV*     x
+        SV*     y
   PREINIT:
-    mpz_t * quo;
+    mpz_t* TEMP;
+    mpz_t* TEMP_1;
     mpz_t * rem;
   PPCODE:
-    quo = malloc (sizeof(mpz_t));
-    rem = malloc (sizeof(mpz_t));
-    mpz_init(*quo);
-    mpz_init(*rem);
-    mpz_tdiv_qr(*quo, *rem, *m, *n);
-  EXTEND(SP, 2);
-  PUSHs(sv_setref_pv(sv_newmortal(), "Math::BigInt::GMP", (void*)quo));
-  PUSHs(sv_setref_pv(sv_newmortal(), "Math::BigInt::GMP", (void*)rem));
-
+    GMP_GET_ARGS_0_1;	/* (TEMP, TEMP_1) = (x,y)  */
+    if (GIMME_V == G_ARRAY)
+      {
+      /* former bdiv_two() routine */
+      rem = malloc (sizeof(mpz_t));
+      mpz_init(*rem);
+      mpz_tdiv_qr(*TEMP, *rem, *TEMP, *TEMP_1);
+      EXTEND(SP, 2);
+      PUSHs( x );
+      PUSHs(sv_setref_pv(sv_newmortal(), "Math::BigInt::GMP", (void*)rem));
+      }
+    else
+      {
+      /* former div_two() routine */
+      mpz_div(*TEMP, *TEMP, *TEMP_1);			/* x /= y */
+      PUSHs( x );
+      }
 
 ##############################################################################
-# _mod() : x %= y
+# _mod() - x %= y
 
 void
 _mod(Class,x,y)
@@ -569,7 +575,7 @@ _is_ten(Class,x)
     RETVAL
 
 ##############################################################################
-# _pow() - m **= n
+# _pow() - x **= y
 
 void
 _pow(Class,x,y)
@@ -674,7 +680,7 @@ _copy(Class,m)
 
 
 ##############################################################################
-# _is_odd() - test for number beeing odd
+# _is_odd() - test for number being odd
 
 int
 _is_odd(Class,n)
@@ -686,7 +692,7 @@ _is_odd(Class,n)
     RETVAL
 
 ##############################################################################
-# _is_even() - test for number beeing even
+# _is_even() - test for number being even
 
 int
 _is_even(Class,n)
