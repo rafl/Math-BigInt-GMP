@@ -12,10 +12,9 @@ require Exporter;
 use vars qw/@ISA $VERSION/;
 @ISA = qw(Exporter);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
         
-# todo: _from_hex _from_bin
-#       _as_hex _as_bin
+# todo: _as_hex _as_bin _rsft _lsft
 
 use Math::GMP;
 
@@ -41,6 +40,13 @@ sub _from_hex
   Math::GMP::new_from_scalar($$d);
   }                                                                             
 
+sub _from_bin
+  {
+  # (bin string) return ref to num
+  my $d = $_[1];
+  Math::GMP::new_from_scalar($$d);
+  }                                                                             
+
 sub _zero
   {
   Math::GMP::new_from_scalar(0);
@@ -53,10 +59,7 @@ sub _one
 
 sub _copy
   {
-  # return Math::GMP->new("$_[1]");	# this is O(N*N)
   Math::GMP::gmp_copy($_[1]);
-#  $_[1]+0;				# this should be O(N)	
-#  $_[1];		# Math::GMP::gmp_foo() already makes copy in every case
   }
 
 sub import { }
