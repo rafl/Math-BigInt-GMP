@@ -114,6 +114,16 @@
   * fixed prereq to require BigInt v1.67
   * added _log_int() to XS code
   * some routines did only return the result, but not modify $x in place
+2004-01-10 v1.13 Tels 4759 tests
+  * tests from BigInt v1.68
+  * removed DESTROY from GMP.pm and made GMP.xs destroy => DESTROY
+  * removed _num from GMP.pm and made GMP.xs __stringify => _num
+  * removed _modinv() from GMP.pm and fixed up _modinv in GMP.xs
+  * disabled the borken _log_int() from the XS code
+  * modify $x in place for _dec, _inc, _add, _mod, _mul, _fac, _and, _or,
+    _xor, _sqrt, _root and _sub (sub in non-reversed form), this removes some
+    malloc/free and makes these ops slightly faster
+    (between 10 and 33% in Math::BigInt (!), depending on input and size)
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

@@ -182,8 +182,8 @@ ok ($C->_acmp($y,$y),0);
 $x = $C->_new(\"8");
 $y = $C->_new(\"5033");
 my ($xmod,$sign) = $C->_modinv($x,$y);
-ok (${$C->_str($xmod)},'629');		# -629 % 5033 == 4404
-ok ($sign, '-');
+ok (${$C->_str($xmod)},'4404');		# -629 % 5033 == 4404
+ok_undef ($sign);
 
 # _div
 $x = $C->_new(\"3333"); $y = $C->_new(\"1111");
@@ -323,3 +323,13 @@ ok ($C->_check(123),'123 is not a reference to Math::BigInt::GMP');
 
 1;
 
+###############################################################################
+# Perl 5.005 does not like ok ($x,undef)
+
+sub ok_undef
+  {
+  my $x = shift;
+
+  ok (1,1) and return if !defined $x;
+  ok ($x,'undef');
+  }

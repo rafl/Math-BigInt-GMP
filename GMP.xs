@@ -13,6 +13,15 @@ PROTOTYPES: ENABLE
 
 #define NEW_GMP_MPZ_T	   RETVAL = malloc (sizeof(mpz_t));
 #define NEW_GMP_MPZ_T_INIT RETVAL = malloc (sizeof(mpz_t)); mpz_init(*RETVAL);
+#define GMP_GET_ARG_0 	   if (sv_derived_from(x, "Math::BigInt::GMP")) {\
+			   IV tmp = SvIV((SV*)SvRV(x));\
+			   TEMP = (mpz_t*) tmp;\
+		  } else { croak("x is not of type Math::BigInt::GMP"); }
+#define GMP_GET_ARG_1 	   if (sv_derived_from(y, "Math::BigInt::GMP")) {\
+			   IV tmp = SvIV((SV*)SvRV(y));\
+			   TEMP_1 = (mpz_t*) tmp;\
+		  } else { croak("y is not of type Math::BigInt::GMP"); }
+#define GMP_GET_ARGS_0_1   GMP_GET_ARG_0; GMP_GET_ARG_1;
 
 ##############################################################################
 # _new() 
@@ -92,22 +101,23 @@ _one(class)
     RETVAL
 
 ##############################################################################
-# destroy() 
+# DESTROY() - free memory of a GMP number
 
 void
-destroy(n)
-	mpz_t *n
+DESTROY(n)
+	mpz_t*	n
 
-  CODE:
+  PPCODE:
     mpz_clear(*n);
     free(n);
 
 ##############################################################################
-# __stringify() - used by _num
+# _num() - numify, return string so that atof() and atoi() can use it
 
 SV *
-__stringify(n)
-	mpz_t *	n
+_num(class, n)
+	SV*	class
+	mpz_t*	n
   PREINIT:
     int len;
     char *buf;
@@ -235,83 +245,107 @@ _modpow(class, n, exp, mod)
 # 0 <= rop < op2. If an inverse doesn't exist the return value is zero and rop
 # is undefined.
 
-#mpz_t *
-#_modinv(class,x,y)
-#       SV*	class
-#       mpz_t*	x
-#       mpz_t*	y
-#
-#  PREINIT:
-#    int rc;
-#    int sign;
-#  CODE:
-#    NEW_GMP_MPZ_T_INIT;
-#    rc = mpz_invert(*RETVAL, *x, *y);
-#    #if (rc == 0)
-#      {
-#      /* inverse doesn't exist, return value undefined */
-#      }
-#    #else
-#      {
-#      /* inverse exists, get sign */
-#      sign = mpz_sgn (*RETVAL);
-#      /* absolute result */
-#      mpz_abs (*RETVAL, *RETVAL);
-#      }
-#  EXTEND(SP, 2);
-#  PUSHs(sv_setref_pv(sv_newmortal(), "Math::BigInt::GMP", (void*)RETVAL));
-#  PUSHs(sv_setref_pv(sv_newmortal(), "Math::BigInt::GMP", (void*)sign));
+void
+_modinv(class,x,y)
+	SV*	class
+	mpz_t*	x
+	mpz_t*	y
+
+  PREINIT:
+    int rc, sign;
+    SV* s;
+    mpz_t* RETVAL;
+  PPCODE:
+    NEW_GMP_MPZ_T_INIT;
+    rc = mpz_invert(*RETVAL, *x, *y);
+    EXTEND(SP, 2);	/* we return two values */
+    if (rc == 0)
+      {
+      /* inverse doesn't exist, return value undefined */
+      PUSHs ( &PL_sv_undef );
+      PUSHs ( &PL_sv_undef );
+      }
+    else
+      {
+      /* inverse exists, get sign */
+      sign = mpz_sgn (*RETVAL);
+      /* absolute result */
+      mpz_abs (*RETVAL, *RETVAL);
+      PUSHs(sv_setref_pv(sv_newmortal(), "Math::BigInt::GMP", (void*)RETVAL));
+      if (sign >= 0)
+        {
+        PUSHs ( &PL_sv_undef );	/* result is ok, keep it */
+        }
+      else
+        {
+	s = sv_newmortal();
+	sv_setpvn (s, "+", 1);
+        PUSHs ( s );		/* result must be negated */
+        }
+      }
 
 ##############################################################################
-# _add()
+# _add() - add $y to $x in place
 
-mpz_t *
+void
 _add(class,x,y)
 	SV*	class
-	mpz_t *	x
-	mpz_t *	y
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    mpz_add(*RETVAL, *x, *y);
-    mpz_set(*x, *RETVAL);
-  OUTPUT:
-    RETVAL
+	SV*	x
+	SV*	y
+  PREINIT:
+	mpz_t* TEMP;  
+	mpz_t* TEMP_1;
+  PPCODE:
+    GMP_GET_ARGS_0_1;	/* (TEMP, TEMP_1) = (x,y)  */
+    mpz_add(*TEMP, *TEMP, *TEMP_1);
+    PUSHs( x );
 
 
 ##############################################################################
-# _inc()
+# _inc() - modify x inline by doing x++
 
-mpz_t *
+void
 _inc(class,x)
 	SV*	class
-	mpz_t*	x
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    mpz_add_ui(*RETVAL, *x, 1);
-    mpz_set(*x, *RETVAL);
-  OUTPUT:
-    RETVAL
+	SV*	x
+  PREINIT:
+	mpz_t* TEMP;  
+  PPCODE:
+    GMP_GET_ARG_0;	/* TEMP =  mpz_t(x)  */
+    mpz_add_ui(*TEMP, *TEMP, 1);
+    PUSHs( x );
 
 ##############################################################################
-# _dec()
+# _dec() - modify x inline by doing x--
 
-mpz_t *
+void
 _dec(class,x)
 	SV*	class
-	mpz_t*	x
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    mpz_sub_ui(*RETVAL, *x, 1);
-    mpz_set(*x, *RETVAL);
-  OUTPUT:
-    RETVAL
-
+	SV*	x
+  PREINIT:
+	mpz_t* TEMP;  
+  PPCODE:
+    GMP_GET_ARG_0;	/* TEMP =  mpz_t(x)  */
+    mpz_sub_ui(*TEMP, *TEMP, 1);
+    PUSHs( x );
 
 ##############################################################################
-# _sub_two()
+# _sub_in_place() - $x -= $y
+
+void
+_sub_in_place(x,y)
+        SV*     x
+        SV*     y
+  PREINIT:
+        mpz_t* TEMP;
+        mpz_t* TEMP_1;
+  PPCODE:
+    GMP_GET_ARGS_0_1;	/* (TEMP, TEMP_1) = (x,y)  */
+    mpz_sub(*TEMP, *TEMP, *TEMP_1);
+    PUSHs( x );
+
+##############################################################################
+# _sub_two() - return $x - $y
 
 mpz_t *
 sub_two(m,n)
@@ -388,19 +422,18 @@ _lsft(class,x,y,base_sv)
 ##############################################################################
 # _mul()
 
-mpz_t *
+void
 _mul(class,x,y)
 	SV*	class
-	mpz_t*	x
-	mpz_t*	y
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    mpz_mul(*RETVAL, *x, *y);
-    mpz_set(*x, *RETVAL);
-  OUTPUT:
-    RETVAL
-
+        SV*     x
+        SV*     y
+  PREINIT:
+        mpz_t* TEMP;
+        mpz_t* TEMP_1;
+  PPCODE:
+    GMP_GET_ARGS_0_1;	/* (TEMP, TEMP_1) = (x,y)  */
+    mpz_mul(*TEMP, *TEMP, *TEMP_1);
+    PUSHs( x );
 
 ##############################################################################
 # _div_two()
@@ -440,20 +473,20 @@ bdiv_two(m,n)
 
 
 ##############################################################################
-# _mod()
+# _mod() : x %= y
 
-mpz_t *
+void
 _mod(class,x,y)
 	SV*	class
-	mpz_t*	x
-	mpz_t*	y
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    mpz_mod(*RETVAL, *x, *y);
-    mpz_set(*x, *RETVAL);
-  OUTPUT:
-    RETVAL
+        SV*     x
+        SV*     y
+  PREINIT:
+        mpz_t* TEMP;
+        mpz_t* TEMP_1;
+  PPCODE:
+    GMP_GET_ARGS_0_1;	/* (TEMP, TEMP_1) = (x,y)  */
+    mpz_mod(*TEMP, *TEMP, *TEMP_1);
+    PUSHs( x );
 
 ##############################################################################
 # _acmp() - cmp two numbers
@@ -500,23 +533,20 @@ _is_one(class,x)
     RETVAL
 
 ##############################################################################
-# _pow() - m ** n
+# _pow() - m **= n
 
-mpz_t *
+void
 _pow(class,x,y)
-	SV*	class
-	mpz_t*	x
-	mpz_t*	y
-
+        SV*     class
+        SV*     x
+        SV*     y
   PREINIT:
-	unsigned long	yui;
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    yui = mpz_get_ui(*y);
-    mpz_pow_ui(*RETVAL, *x, yui);
-    mpz_set(*x, *RETVAL);
-  OUTPUT:
-    RETVAL
+        mpz_t* TEMP;
+        mpz_t* TEMP_1;
+  PPCODE:
+    GMP_GET_ARGS_0_1;	/* (TEMP, TEMP_1) = (x,y)  */
+    mpz_pow_ui(*TEMP, *TEMP, mpz_get_ui( *TEMP_1 ) );
+    PUSHs( x );
 
 ##############################################################################
 # _gcd() - gcd(m,n)
@@ -534,69 +564,69 @@ _gcd(class,x,y)
     RETVAL
 
 ##############################################################################
-# _and() - m & n
+# _and() - m &= n
 
-mpz_t *
-_and(class,m,n)
-	SV*	class
-	mpz_t*	m
-	mpz_t*	n
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    mpz_and(*RETVAL, *m, *n);
-  OUTPUT:
-    RETVAL
-
-##############################################################################
-# _xor() - m ^ n
-
-mpz_t *
-_xor(class,m,n)
-	SV*	class
-	mpz_t*	m
-	mpz_t*	n
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    mpz_xor(*RETVAL, *m, *n);
-  OUTPUT:
-    RETVAL
+void
+_and(class,x,y)
+        SV*     class
+        SV*     x
+        SV*     y
+  PREINIT:
+        mpz_t* TEMP;
+        mpz_t* TEMP_1;
+  PPCODE:
+    GMP_GET_ARGS_0_1;	/* (TEMP, TEMP_1) = (x,y)  */
+    mpz_and(*TEMP, *TEMP, *TEMP_1);
+    PUSHs( x );
 
 
 ##############################################################################
-# _or() - m | n
+# _xor() - m =^ n
 
-mpz_t *
-_or(class,m,n)
-	SV*	class
-	mpz_t*	m
-	mpz_t*	n
+void
+_xor(class,x,y)
+        SV*     class
+        SV*     x
+        SV*     y
+  PREINIT:
+        mpz_t* TEMP;
+        mpz_t* TEMP_1;
+  PPCODE:
+    GMP_GET_ARGS_0_1;   /* (TEMP, TEMP_1) = (x,y)  */
+    mpz_xor(*TEMP, *TEMP, *TEMP_1);
+    PUSHs( x );
 
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    mpz_ior(*RETVAL, *m, *n);
-  OUTPUT:
-    RETVAL
+
+##############################################################################
+# _or() - m =| n
+
+void
+_or(class,x,y)
+        SV*     class
+        SV*     x
+        SV*     y
+  PREINIT:
+        mpz_t* TEMP;
+        mpz_t* TEMP_1;
+  PPCODE:
+    GMP_GET_ARGS_0_1;   /* (TEMP, TEMP_1) = (x,y)  */
+    mpz_ior(*TEMP, *TEMP, *TEMP_1);
+    PUSHs( x );
 
 
 ##############################################################################
 # _fac() - n! (factorial)
 
-mpz_t *
-_fac(class,n)
-	SV*	class
-	mpz_t*	n
+void
+_fac(class,x)
+        SV*     class
+        SV*     x
   PREINIT:
-    unsigned long nui;
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    nui = mpz_get_ui(*n);
-    mpz_fac_ui(*RETVAL, nui);
-    mpz_set(*n, *RETVAL);
-  OUTPUT:
-    RETVAL
+        mpz_t* TEMP;
+  PPCODE:
+    GMP_GET_ARG_0;   /* TEMP = x */
+    mpz_fac_ui(*TEMP, mpz_get_ui(*TEMP));
+    PUSHs( x );
 
 
 ##############################################################################
@@ -643,74 +673,31 @@ _is_even(class,n)
 ##############################################################################
 # _sqrt() - square root
 
-mpz_t *
+void
 _sqrt(class,x)
-        SV*		class
-	mpz_t *		x
+        SV*     class
+        SV*     x
+  PREINIT:
+        mpz_t* TEMP;
+  PPCODE:
+    GMP_GET_ARG_0;   /* TEMP = x */
+    mpz_sqrt(*TEMP, *TEMP);
+    PUSHs( x );
 
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    mpz_sqrt(*RETVAL, *x);
-  OUTPUT:
-    RETVAL
 
 ##############################################################################
 # _root() - integer roots
 
-mpz_t *
-_root(class,x,y)
-        SV*		class
-	mpz_t *		x
-	mpz_t *		y
-  PREINIT:
-    unsigned long nui;
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-    nui = mpz_get_ui(*y);
-    mpz_root(*RETVAL, *x, nui);
-  OUTPUT:
-    RETVAL
-
-
-##############################################################################
-# _log_int() - integer log of $x to base $base
-
 void
-_log_int(class,x,base)
-        SV*		class
-	mpz_t *		x
-	mpz_t *		base
-  
+_root(class,x,y)
+        SV*     class
+        SV*     x
+        SV*     y
   PREINIT:
-    mpz_t *		trial;
-    mpz_t *		RETVAL;
-
-  CODE:
-    NEW_GMP_MPZ_T_INIT;
-
-  /* this trial multiplication is very fast, even for large counts (like for 
-     2 ** 1024, since this still requires only 1024 very fast steps
-     (multiplication of a large number by a very small number is very fast)) */
-
-    mpz_init_set_ui(*RETVAL,0);
-    trial = malloc (sizeof(mpz_t));
-    mpz_init(*trial);
-    mpz_set(*trial, *base);
-     
-    while ( mpz_cmp(*trial, *x) <= 0)
-      {
-      mpz_mul(*trial, *trial, *base); mpz_add_ui(*RETVAL,*RETVAL,1);
-      }
-    mpz_clear (*trial);
-    free (trial);
-    mpz_set (*x, *RETVAL);
-    mpz_clear (*RETVAL);
-    free (RETVAL);
-  /* return X and undef (don't know whether result is exact)
-     XXX TODO compute exact */
-  EXTEND(SP, 2);
-  PUSHs(sv_setref_pv(sv_newmortal(), "Math::BigInt::GMP", (void*)x));
-  PUSHs(newSViv(0));
-
+        mpz_t* TEMP;
+        mpz_t* TEMP_1;
+  PPCODE:
+    GMP_GET_ARGS_0_1;   /* (TEMP, TEMP_1) = (x,y)  */
+    mpz_root(*TEMP, *TEMP, mpz_get_ui(*TEMP_1));
+    PUSHs( x );
 

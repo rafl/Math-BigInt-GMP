@@ -1,8 +1,8 @@
 
 * _lsft() and _rsft() could probably be a bit more optimized
-* move _modinv() to XS
-* move sub() and div to XS ?
-* replace all malloc() with New() and all free() with Savefree()
+* add _log_int() to XS
+* move sub() and div() completely to XS ?
+* replace all malloc() with New() and all free() with Savefree()?
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
