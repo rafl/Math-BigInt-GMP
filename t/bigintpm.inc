@@ -1859,7 +1859,8 @@ abc:12:NaN
 -2:NaN
 -123:NaN
 Nan:NaN
-+inf:NaN
++inf:inf
+-inf:NaN
 &bround
 $round_mode('trunc')
 0:12:0
@@ -1984,6 +1985,7 @@ abc:NaN
 0:0x0
 -0:0x0
 1:0x1
+255:0xff
 0x123456789123456789:0x123456789123456789
 +inf:inf
 -inf:-inf

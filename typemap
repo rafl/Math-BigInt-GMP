@@ -1,0 +1,14 @@
+mpz_t *		MPZ
+
+INPUT
+MPZ
+        if (sv_derived_from($arg, \"Math::BigInt::GMP\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = ($type) tmp;
+        }
+        else
+            croak(\"$var is not of type Math::BigInt::GMP\")
+
+OUTPUT
+MPZ
+	sv_setref_pv($arg, \"Math::BigInt::GMP\", (void*)$var);

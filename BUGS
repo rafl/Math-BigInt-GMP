@@ -1,7 +1,7 @@
 
 Known bugs:
 
-* None known yet
+* Some problems with left/right shifting in base != 2 seem to occur
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

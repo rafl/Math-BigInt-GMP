@@ -9,8 +9,9 @@ BEGIN
   unshift @INC, '../lib'; # for running manually
   my $location = $0; $location =~ s/bigintpm.t//;
   unshift @INC, $location; # to locate the testing files
+  unshift @INC, '../blib/arch';
   chdir 't' if -d 't';
-  plan tests => 2362;
+  plan tests => 2365;
   }
 
 use Math::BigInt lib => 'GMP';

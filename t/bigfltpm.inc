@@ -266,6 +266,7 @@ sub ok_undef
   }
 
 __DATA__
+
 $div_scale = 40;
 &flog
 0:NaN

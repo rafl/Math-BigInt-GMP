@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.21.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+SHA1 70d6187d0152848c922dc4360fa6dd3a3dc35c62 BUGS
+SHA1 62077e45a03df96aacfcd2538f7cea6e6c658388 CHANGES
+SHA1 a7c1e085fd6237ba6ed2244b5584992421e921a1 GMP.xs
+SHA1 e779295d75ce92040a22da5fccccd54c0884df3d INSTALL
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 a3ccab809822544e47cf1e802c248f43f103db5f MANIFEST
+SHA1 479834beb66ef7bd007bf3fcea9a61cbd1fd8da5 Makefile.PL
+SHA1 836ebb7475ffe1a62c01e300e8d1527573822742 README
+SHA1 9ed580e2b519761f71796f2f72b6eaeef6435b05 TODO
+SHA1 74dc9f9697564f1b63ac1f253a417475bcb153d7 lib/Math/BigInt/GMP.pm
+SHA1 236ed86927358014ccdaba4229e98d4f23c151b0 t/bigfltpm.inc
+SHA1 0cc2d653edf09c7ab3a13e2f55b9265093526995 t/bigfltpm.t
+SHA1 d32b6790795473734333cdffdd4c9177f97fd017 t/bigintg.t
+SHA1 37cb3d2e5e967856a09b2d85d7332d1cbc38db9f t/bigintpm.inc
+SHA1 8811b9b5f21bbddcc8f32d0864dca9b298562dd2 t/bigintpm.t
+SHA1 f7aad87c0a30330d474f4fb45f6d1953d6701d2f typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.6 (GNU/Linux)
+Comment: When cryptography is outlawed, bayl bhgynjf jvyy unir cevinpl.
+
+iQEVAwUBPgjUbHcLPEOTuEwVAQHlFgf/Ro7H9xd3CSkeDvJkfnkwESY/hieSNggd
+TY7k42eTZfmTmD2+lrP1G+WJJMj26yFE85ICIKtQHZ75FjAEDoykxc85MDR30kC9
+8uq8lps8Srj8Ck1Q+jG2Dol5dfH5BPBtiUxOl4FutxvmVdcwRz4HNe8vazrwSrPS
+I/IVHgRTrzc1Dhf/w9oKBYlmQVa5TpTmSTORBTdjgKv7PImbG5+sbfds4qLlew3z
+gXeyCcwuX2TdZZAL4ujPC7P55CpaVGXwkIlOXeTpk3RVuZwZZmSi5rDb/BBhHZ5v
+SZRF3d2yuJ2O7RTJn2al5qqIyhu1tLOC0R3FU7LOhfVtnbCGqFSnww==
+=UsOL
+-----END PGP SIGNATURE-----

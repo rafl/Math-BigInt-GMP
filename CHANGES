@@ -14,18 +14,14 @@
  * added _mod() for more speed for $x % $y
 
 	#!/usr/bin/perl -w
-	
 	use lib 'lib';
 	#use lib '../Math-BigInt-GMP-1.02/lib';
-	
 	use Math::BigInt lib => 'GMP';
 	use Benchmark;
-	
 	my $digits = 1024;
 	my $x = Math::BigInt->new('1' . '0' x $digits);
 	my $y = Math::BigInt->new('3' . '0' x ($digits - 2) . '3');
 	my $u = Math::BigInt->new('3');
-	
 	timethese ( 2000,
 	  {
 	  mod_l => sub { $z = $x % $y, },
@@ -34,7 +30,6 @@
 	  } );
 
 	On a 1 Ghz Athlon with v1.45 of BigInt in ops/s:
-
 		v1.02	v1.03
 	mod_s    1100	 2350 
 	mod_l    1111    2325
@@ -68,6 +63,36 @@
 2002-07-07 v1.07 Tels
   * testsuite from BigInt v1.60 - 4054 tests 
   * fixed PREREQUISITES to BigInt v1.60
+2002-12-12 v1.08 Tels 4069 tests (never released)
+  * added implementation of bmodpow() using GMPs mpow_gmp()
+  * release signed by key http://bloodgate.com/tels.asc id 93B84C15
+2002-12-15 v1.10a Tels Never released
+  * no longer needs Math::GMP (and Carp), but uses own XS layer
+  * is thus faster (saves one perl subroutine layer) and less memory hungry
+    (it now uses even less memory than using Calc!)
+    new XS lets us cut out a subroutine layer
+  * new XS will enable us to implement *all* missing functions like _root(),
+    _as_hex(), _as_bin() and _rsft(), _lsft()
+  * fixed PREREQ to BigInt v1.65
+  * extended tests in bigintg.t to cover more functions
+2002-12-24 v1.10 Tels 4109 tests
+  * Merry Christmas and a Happy New Year to all!
+  * cut out more dead wood from GMP.xs, GMP.so file shrunk a bit
+  * added some comments in GMP.xs
+  * fixed PREREQ to BigInt v1.64 since v1.65 is not yet out *sigh*
+  * more functions like _is_odd()/_is_even()/_acmp() directly in XS - cut away
+    perl layer subroutines for more speed (about 10-30% more ops/s for small
+    argument or constant cases or other cases where the overhead is greater
+    than the actual math operation itself)
+  * __stringify() no longer malloc()s a temp. storage => faster
+  * added _root(), _lsft() and_rsft() functions for great speedups
+  * Running the benchmark script above (adopted a bit) on the same 1 Ghz AMD
+    under BigInt v1.64:
+    Benchmark: running div_l, mod_l, mod_s for at least 3 CPU seconds...
+      div_l:  3s ( 3.20 usr +  0.00 sys =  3.20 CPU) @ 4655.00/s (n=14896)
+      mod_l:  4s ( 3.31 usr +  0.00 sys =  3.31 CPU) @ 6851.96/s (n=22680)
+      mod_s:  3s ( 3.01 usr +  0.00 sys =  3.01 CPU) @ 7088.37/s (n=21336)
+  * Full (memory and other) benchmarks at http://bloodgate.com/perl/bigint/
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

@@ -8,6 +8,7 @@ BEGIN
   $| = 1;
   unshift @INC, '../lib'; # for running manually
   unshift @INC, './t'; # to locate the testing files
+  unshift @INC, '../blib/arch';
   # chdir 't' if -d 't';
   plan tests => 1627;
   }

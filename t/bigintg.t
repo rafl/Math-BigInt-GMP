@@ -8,7 +8,8 @@ BEGIN
   $| = 1;
   chdir 't' if -d 't';
   unshift @INC, '../lib'; # for running manually
-  plan tests => 65;
+  unshift @INC, '../blib/arch';
+  plan tests => 117;
   }
 
 # testing of Math::BigInt::GMP, primarily for interface/api and not for the
@@ -22,18 +23,16 @@ my ($x,$y,$r,$z);
 
 # _new and _str
 $x = $C->_new(\"123"); $y = $C->_new(\"321");
-ok (ref($x),'Math::GMP'); ok (${$C->_str($x)},123); ok (${$C->_str($y)},321);
+ok (ref($x),'Math::BigInt::GMP');
+ok (${$C->_str($x)},123); ok (${$C->_str($y)},321);
 
 # _add, _sub, _mul, _div
 ok (${$C->_str($C->_add($x,$y))},444);
 ok (${$C->_str($C->_sub($x,$y))},123);
-print "mul\n";
 ok (${$C->_str($C->_mul($x,$y))},39483);
-ok (${$C->_str($C->_div($x,$y))},123);
+ok (${$C->_str(scalar $C->_div($x,$y))},123);
 
-print "x ok\n";
 ok (${$C->_str($C->_mul($x,$y))},39483);
-print "xy ok\n";
 ok (${$C->_str($x)},39483);
 ok (${$C->_str($y)},321);
 $z = $C->_new(\"2");
@@ -61,6 +60,38 @@ ok ($C->_is_zero($C->_zero()),1); ok ($C->_is_zero($C->_one()),0);
 ok ($C->_is_odd($C->_one()),1); ok ($C->_is_odd($C->_zero()),0);
 ok ($C->_is_even($C->_one()),0); ok ($C->_is_even($C->_zero()),1);
 
+ok ($C->_is_odd($C->_new(\"2")),0);
+ok ($C->_is_even($C->_new(\"2")),1); 
+
+# _as_hex, _as_bin
+$x = $C->_new(\"65535"); ok (${$C->_as_hex($x)},'0xffff');
+$x = $C->_new(\"65536"); ok (${$C->_as_hex($x)},'0x10000');
+$x = $C->_new(\"8"); ok (${$C->_as_hex($x)},'0x8');
+$x = $C->_new(\"0"); ok (${$C->_as_hex($x)},'0x0');
+
+$x = $C->_new(\"8"); ok (${$C->_as_bin($x)},'0b1000');
+$x = $C->_new(\"16"); ok (${$C->_as_bin($x)},'0b10000');
+$x = $C->_new(\"15"); ok (${$C->_as_bin($x)},'0b1111');
+$x = $C->_new(\"0"); ok (${$C->_as_bin($x)},'0b0');
+
+# _lsft
+$x = $C->_new(\"8"); $y = $C->_new(\"2"); 
+$x = $C->_lsft($x,$y,2);		# 8 << 2 = 32
+ok (${$C->_str($x)},'32');
+$x = $C->_lsft($x,$y,10);		# 8 << 2 (base 10) = 800
+ok (${$C->_str($x)},'3200');
+
+# _rsft
+$x = $C->_new(\"64"); $y = $C->_new(\"2"); 
+$x = $C->_rsft($x,$y,2);		# 64 >> 2 = 16
+ok (${$C->_str($x)},'16');
+$x = $C->_new(\"64"); $y = $C->_new(\"1"); 
+$x = $C->_rsft($x,$y,10);		# 64 >> 1 = 6 in base 10
+ok (${$C->_str($x)},'6');
+$x = $C->_new(\"600"); 
+$x = $C->_rsft($x,$y,10);		# 600 >> 1 = 60 in base 10
+ok (${$C->_str($x)},'60');
+
 # _digit
 $x = $C->_new(\"123456789");
 ok ($C->_digit($x,0),9);
@@ -77,6 +108,23 @@ ok ($C->_acmp($x,$y),-1);
 ok ($C->_acmp($y,$x),1);
 ok ($C->_acmp($x,$x),0);
 ok ($C->_acmp($y,$y),0);
+$x = $C->_new(\"2");
+$y = $C->_one();
+ok ($C->_acmp($x,$y),1);
+ok ($C->_acmp($y,$x),-1);
+ok ($C->_acmp($x,$x),0);
+ok ($C->_acmp($y,$y),0);
+$y = $C->_zero();
+ok ($C->_acmp($x,$y),1);
+ok ($C->_acmp($y,$x),-1);
+ok ($C->_acmp($x,$x),0);
+ok ($C->_acmp($y,$y),0);
+$x = $C->_one();
+$y = $C->_zero();
+ok ($C->_acmp($x,$y),1);
+ok ($C->_acmp($y,$x),-1);
+ok ($C->_acmp($x,$x),0);
+ok ($C->_acmp($y,$y),0);
 
 # _div
 $x = $C->_new(\"3333"); $y = $C->_new(\"1111");
@@ -85,6 +133,12 @@ $x = $C->_new(\"33333"); $y = $C->_new(\"1111"); ($x,$y) = $C->_div($x,$y);
 ok (${$C->_str($x)},30); ok (${$C->_str($y)},3);
 $x = $C->_new(\"123"); $y = $C->_new(\"1111"); 
 ($x,$y) = $C->_div($x,$y); ok (${$C->_str($x)},0); ok (${$C->_str($y)},123);
+
+# _modpow
+$x = $C->_new(\"8"); $y = $C->_new(\"7");
+$z = $C->_new(\"5032");
+$x = $C->_modpow($x,$y,$z);
+ok (${$C->_str($x)},3840);
 
 # _and, _xor, _or
 $x = $C->_new(\"7"); $y = $C->_new(\"5"); ok (${$C->_str($C->_and($x,$y))},5);
@@ -114,9 +168,31 @@ foreach (qw/
 # _num
 $x = $C->_new(\"12345"); $x = $C->_num($x); ok (ref($x)||'',''); ok ($x,12345);
 
+# _sqrt
+$x = $C->_new(\"144"); $x = $C->_sqrt($x); ok (${$C->_str($x)},12);
+$x = $C->_new(\"145"); $x = $C->_sqrt($x); ok (${$C->_str($x)},12);
+$x = $C->_new(\"143"); $x = $C->_sqrt($x); ok (${$C->_str($x)},11);
+
+# _root
+$y = $C->_new(\"2");
+$x = $C->_new(\"144"); $x = $C->_root($x,$y); ok (${$C->_str($x)},12);
+$x = $C->_new(\"143"); $x = $C->_root($x,$y); ok (${$C->_str($x)},11);
+$x = $C->_new(\"145"); $x = $C->_root($x,$y); ok (${$C->_str($x)},12);
+
+for (my $i = 2; $i < 8; $i ++)
+  {
+  my $r = 9 ** $i;
+  $y = $C->_new(\$i);
+  $x = $C->_new(\$r); $x = $C->_root($x,$y); ok (${$C->_str($x)},9);
+  $r++;
+  $x = $C->_new(\$r); $x = $C->_root($x,$y); ok (${$C->_str($x)},9);
+  $r -= 2;
+  $x = $C->_new(\$r); $x = $C->_root($x,$y); ok (${$C->_str($x)},8);
+  }
+
 # _copy
 $x = $C->_new(\"123"); $y = $C->_copy($x); $z = $C->_new(\"321");
-$C->_add($x,$z);
+$x = $C->_add($x,$z);
 ok (${$C->_str($x)},'444');
 ok (${$C->_str($y)},'123');
 
@@ -125,10 +201,10 @@ $x = $C->_new(\"128"); $y = $C->_new(\'96'); $x = $C->_gcd($x,$y);
 ok (${$C->_str($x)},'32');
 
 # _fac
-$x = $C->_new(\"1"); $x = $C->_fac($x,$y); ok (${$C->_str($x)},'1');
-$x = $C->_new(\"2"); $x = $C->_fac($x,$y); ok (${$C->_str($x)},'2');
-$x = $C->_new(\"3"); $x = $C->_fac($x,$y); ok (${$C->_str($x)},'6');
-$x = $C->_new(\"4"); $x = $C->_fac($x,$y); ok (${$C->_str($x)},'24');
+$x = $C->_new(\"1"); $x = $C->_fac($x); ok (${$C->_str($x)},'1');
+$x = $C->_new(\"2"); $x = $C->_fac($x); ok (${$C->_str($x)},'2');
+$x = $C->_new(\"3"); $x = $C->_fac($x); ok (${$C->_str($x)},'6');
+$x = $C->_new(\"4"); $x = $C->_fac($x); ok (${$C->_str($x)},'24');
 
 # should not happen:
 # $x = $C->_new(\"-2"); $y = $C->_new(\"4"); ok ($C->_acmp($x,$y),-1);
@@ -136,7 +212,7 @@ $x = $C->_new(\"4"); $x = $C->_fac($x,$y); ok (${$C->_str($x)},'24');
 # _check
 $x = $C->_new(\"123456789");
 ok ($C->_check($x),0);
-ok ($C->_check(123),'123 is not a reference to Math::GMP');
+ok ($C->_check(123),'123 is not a reference to Math::BigInt::GMP');
 
 # done
 

@@ -1,5 +1,7 @@
 
-* _copy() could be faster, find native copy method
+* _lsft() and _rsft() could probably be a bit more optimized
+* move _modinv() to XS
+* move sub() and div to XS ?
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

@@ -4,7 +4,10 @@ INSTALL
 README
 LICENSE
 MANIFEST
+SIGNATURE
 TODO
+GMP.xs
+typemap
 Makefile.PL
 lib/Math/BigInt/GMP.pm
 t/bigintg.t			# Math::GMP implementation of uint math core
