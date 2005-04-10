@@ -9,7 +9,7 @@ BEGIN
   chdir 't' if -d 't';
   unshift @INC, '../lib';		# for running manually
   unshift @INC, '../blib/arch';		# for running manually
-  plan tests => 288;
+  plan tests => 292;
   }
 
 use Math::BigInt::GMP;
@@ -343,6 +343,19 @@ foreach (qw/999 9999 99999 9999999 99999999 999999999 9999999999 99999999999/)
 
 $x = $C->_new("1000"); $C->_inc($x); ok ($C->_str($x),'1001');
 $C->_dec($x); ok ($C->_str($x),'1000');
+
+###############################################################################
+# _log_int (test handling of plain scalar as base, bug up to v1.17)
+
+$x = $C->_new("81"); 
+
+my ($r, $exact) = $C->_log_int($x, $C->_new("3"));
+ok ($C->_str( $r ), '4');
+ok ($exact, 1);
+
+($r, $exact) = $C->_log_int($x,3);
+ok ($C->_str( $r ), '4');
+ok ($exact, 1);
 
 ###############################################################################
 # _mod

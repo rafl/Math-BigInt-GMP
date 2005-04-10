@@ -4,9 +4,10 @@ sub MY::metafile {
   package MY;
   my $self = shift;
   if (!eval { require YAML; 1 })
-  {
-    warn ("YAML not installed, cannot override metafile"); return $self->SUPER::metafile_target(@_);
-  };
+    {
+    warn ("YAML not installed, make dist will not override metafile");
+    return $self->SUPER::metafile_target(@_);
+    }
 
   my $node = new YAML::Node {};
 
@@ -31,10 +32,8 @@ WriteMakefile(
     'NAME'		=> 'Math::BigInt::GMP',
     'VERSION_FROM'	=> 'lib/Math/BigInt/GMP.pm', # finds $VERSION
     'PREREQ_PM'		=> {
-				Math::BigInt => 1.74,
+				Math::BigInt => 1.76,
 				XSLoader => 0.02,
 			   }, 
     'LIBS'		=> ['-lgmp'], # e.g., '-lm'
-    'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
-    'INC'		=> '', # e.g., '-I/usr/include/other'
 );

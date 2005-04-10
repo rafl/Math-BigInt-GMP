@@ -147,6 +147,9 @@
   * simplify sub code in XS (left-over artifact from v1.16)
   * fix a leak in _zeros()
   * _zeros() is now much faster for odd numbers (O(1) vs. O(N*N))
+2005-04-11 v1.18 Tels 5186 tests
+  * _log_int() handles now plain scalars as $base parameter
+  * take over tests from MBI 1.76, require it
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!

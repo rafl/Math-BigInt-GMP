@@ -9,7 +9,7 @@ use 5.005;
 
 use vars qw/$VERSION/;
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 use XSLoader;
 XSLoader::load "Math::BigInt::GMP", $VERSION;
@@ -60,6 +60,10 @@ sub _log_int
 
   # X == 0 => NaN
   return if _is_zero($c,$x);
+
+  $base = _new($c,2) unless defined $base;
+  $base = _new($c,$base) unless ref $base;
+
   # BASE 0 or 1 => NaN
   return if _is_zero($c,$base) || _is_one($c,$base);
 
@@ -130,7 +134,7 @@ the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Tels <http://bloodgate.com/> in 2001-2004.
+Tels <http://bloodgate.com/> in 2001-2005.
 
 Thanx to Chip Turner for providing Math::GMP, which was inspiring my work.
 
