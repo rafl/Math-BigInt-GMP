@@ -9,7 +9,7 @@ use 5.005;
 
 use vars qw/$VERSION/;
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 use XSLoader;
 XSLoader::load "Math::BigInt::GMP", $VERSION;
@@ -127,6 +127,12 @@ to access the GMP c-library. This cut's out another (perl sub routine) layer
 and also reduces the memory footprint by not loading Math::GMP and Carp at
 all.
 
+=head1 METHODS
+
+=head2 api_version()
+
+Defines the API version for Math::BigInt.
+
 =head1 LICENSE
  
 This program is free software; you may redistribute it and/or modify it under
@@ -134,7 +140,7 @@ the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Tels <http://bloodgate.com/> in 2001-2005.
+Tels <http://bloodgate.com/> in 2001-2007.
 
 Thanx to Chip Turner for providing Math::GMP, which was inspiring my work.
 

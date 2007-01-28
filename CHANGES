@@ -1,4 +1,9 @@
+2007-01-28 v1.19 Tels 5341 tests
+  * add support for octal
+  * take over tests from MBI 1.78 and require it
+  * add POD tests
 
+Older Changelog:
 
 2001-07-22 v1.00 Tels
  * First version (basically working with some quirks)

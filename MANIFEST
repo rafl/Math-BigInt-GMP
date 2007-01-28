@@ -20,4 +20,6 @@ t/bigintpm.t			# original test, but with Math::GMP
 t/bigintpm.inc			# actual tests
 t/bigfltpm.t			# original test, but with Math::GMP 
 t/bigfltpm.inc			# actual tests
+t/pod.t
+t/pod_cov.t
 META.yml                                 Module meta-data (added by MakeMaker)

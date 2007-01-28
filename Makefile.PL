@@ -9,9 +9,11 @@ sub MY::metafile {
     return $self->SUPER::metafile_target(@_);
     }
 
+  require YAML::Node;
   my $node = new YAML::Node {};
 
   $node->{name}                 = $self->{DISTNAME};
+  $node->{author}               = 'Tels';
   $node->{version}              = $self->{VERSION};
   $node->{version_from}         = $self->{VERSION_FROM};
   $node->{license}              = 'perl';
@@ -32,8 +34,9 @@ WriteMakefile(
     'NAME'		=> 'Math::BigInt::GMP',
     'VERSION_FROM'	=> 'lib/Math/BigInt/GMP.pm', # finds $VERSION
     'PREREQ_PM'		=> {
-				Math::BigInt => 1.76,
+				Math::BigInt => 1.78,
 				XSLoader => 0.02,
 			   }, 
     'LIBS'		=> ['-lgmp'], # e.g., '-lm'
+    'PREREQ_FATAL'	=> 1,
 );

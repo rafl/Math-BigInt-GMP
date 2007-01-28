@@ -63,6 +63,19 @@ _from_hex(Class,x)
     RETVAL
 
 ##############################################################################
+# _from_oct()
+
+mpz_t *
+_from_oct(Class,x)
+	SV*	x
+
+  CODE:
+    NEW_GMP_MPZ_T;
+    mpz_init_set_str(*RETVAL, SvPV_nolen(x), 0);
+  OUTPUT:
+    RETVAL
+
+##############################################################################
 # _zero()
 
 mpz_t *
@@ -247,6 +260,28 @@ _as_bin(Class,n)
   OUTPUT:
     RETVAL
 
+##############################################################################
+# _as_oct() - return ref to octal string (prefixed with 0)
+
+SV *
+_as_oct(Class,n)
+	mpz_t *	n
+
+  PREINIT:
+    int len;
+    char *buf;
+    
+  CODE:
+    /* len is always >= 1, and accurate (unlike in decimal) */
+    len = mpz_sizeinbase(*n, 8) + 1;
+    RETVAL = newSV(len);		/* alloc len +1 (+1 for '0') bytes */
+    SvPOK_on(RETVAL);
+    buf = SvPVX(RETVAL);		/* get ptr to storage */ 
+    *buf++ = '0';			/* prepend '0' */
+    mpz_get_str(buf, 8, *n);		/* convert to binary string */
+    SvCUR_set(RETVAL, len); 		/* so set real length */
+  OUTPUT:
+    RETVAL
 
 ##############################################################################
 # _modpow() - ($n ** $exp) % $mod

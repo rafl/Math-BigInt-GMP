@@ -9,7 +9,7 @@ BEGIN
   unshift @INC, '../lib'; 	# for running manually
   unshift @INC, '../blib/arch';
   chdir 't' if -d 't';
-  plan tests => 2012;
+  plan tests => 2042;
   }
 
 use Math::BigInt lib => 'GMP';
