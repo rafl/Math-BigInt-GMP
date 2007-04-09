@@ -9,7 +9,7 @@ BEGIN
   chdir 't' if -d 't';
   unshift @INC, '../lib';		# for running manually
   unshift @INC, '../blib/arch';		# for running manually
-  plan tests => 292;
+  plan tests => 302;
   }
 
 use Math::BigInt::GMP;
@@ -116,7 +116,11 @@ $x = $C->_new("1234567"); ok ($C->_len($x),7);
 $x = $C->_new("12345678"); ok ($C->_len($x),8);
 $x = $C->_new("123456789"); ok ($C->_len($x),9);
 
+$x = $C->_new("7"); ok ($C->_len($x),1);
 $x = $C->_new("8"); ok ($C->_len($x),1);
+$x = $C->_new("9"); ok ($C->_len($x),1);
+$x = $C->_new("10"); ok ($C->_len($x),2);
+$x = $C->_new("11"); ok ($C->_len($x),2);
 $x = $C->_new("21"); ok ($C->_len($x),2);
 $x = $C->_new("321"); ok ($C->_len($x),3);
 $x = $C->_new("4321"); ok ($C->_len($x),4);
@@ -125,6 +129,9 @@ $x = $C->_new("654321"); ok ($C->_len($x),6);
 $x = $C->_new("7654321"); ok ($C->_len($x),7);
 $x = $C->_new("87654321"); ok ($C->_len($x),8);
 $x = $C->_new("987654321"); ok ($C->_len($x),9);
+$x = $C->_new("12345678901234567890"); ok ($C->_len($x), 20);
+$x = $C->_new("1234567890" x 10); ok ($C->_len($x), 10 * 10);
+$x = $C->_new("1234567890" x 100); ok ($C->_len($x), 10 * 100);
 
 for (my $i = 1; $i < 9; $i++)
   {
@@ -156,6 +163,9 @@ $x = $C->_new("152"); ok ($C->_zeros($x),0);
 $x = $C->_new("123000"); ok ($C->_zeros($x),3); 
 $x = $C->_new("123001"); ok ($C->_zeros($x),0); 
 $x = $C->_new("1"); ok ($C->_zeros($x),0); 
+$x = $C->_new("8"); ok ($C->_zeros($x),0); 
+$x = $C->_new("10"); ok ($C->_zeros($x),1); 
+$x = $C->_new("11"); ok ($C->_zeros($x),0); 
 $x = $C->_new("0"); ok ($C->_zeros($x),0); 
 
 # _lsft, _rsft

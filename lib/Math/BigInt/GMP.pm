@@ -4,12 +4,12 @@
 package Math::BigInt::GMP;
 
 use strict;
-use 5.005;
+use 5.006002;
 # use warnings; # dont use warnings for older Perls
 
 use vars qw/$VERSION/;
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 use XSLoader;
 XSLoader::load "Math::BigInt::GMP", $VERSION;
@@ -23,16 +23,8 @@ BEGIN
   *_str = \&_num;
   }
 
-# Routines not present here are in GMP.xs
-
 ##############################################################################
-# testing
-
-sub _len
-  {
-  # return length, aka digits in decmial, costly!!
-  length( Math::BigInt::GMP::_num(@_) );
-  }
+# Routines not present here are in GMP.xs
 
 sub _digit
   {
@@ -43,7 +35,7 @@ sub _digit
   }
 
 ###############################################################################
-# check routine to test internal state of corruptions
+# routine to test internal state for corruptions
 
 sub _check
   {
@@ -126,12 +118,6 @@ Math::BigInt::GMP now no longer uses Math::GMP, but provides it's own XS layer
 to access the GMP c-library. This cut's out another (perl sub routine) layer
 and also reduces the memory footprint by not loading Math::GMP and Carp at
 all.
-
-=head1 METHODS
-
-=head2 api_version()
-
-Defines the API version for Math::BigInt.
 
 =head1 LICENSE
  

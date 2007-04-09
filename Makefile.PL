@@ -27,16 +27,15 @@ sub MY::metafile {
   $dump =~ s/^(.*)$/\t\$(NOECHO) \$(ECHO) "$1" >>META.yml/gm;
   $dump =~ s/>>META\.yml/>META.yml/;
 
-  return "metafile:\n$dump";
-}
+  "metafile:\n$dump";
+  }
 
 WriteMakefile(
     'NAME'		=> 'Math::BigInt::GMP',
-    'VERSION_FROM'	=> 'lib/Math/BigInt/GMP.pm', # finds $VERSION
+    'VERSION_FROM'	=> 'lib/Math/BigInt/GMP.pm',
     'PREREQ_PM'		=> {
-				Math::BigInt => 1.78,
+				Math::BigInt => 1.82,
 				XSLoader => 0.02,
 			   }, 
-    'LIBS'		=> ['-lgmp'], # e.g., '-lm'
-    'PREREQ_FATAL'	=> 1,
+    'LIBS'		=> ['-lgmp'],
 );

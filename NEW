@@ -1,8 +1,0 @@
-
-Changes between the last and this version:
-
-v1.18:
-  * bugfix: _log_int() handles now plain scalars as $base parameter
-
-#############################################################################
-

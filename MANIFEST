@@ -1,25 +1,25 @@
-CHANGES
-CREDITS
 BUGS
-INSTALL
-README
-LICENSE
-MANIFEST
-NEW
-SIGNATURE
-TODO
-GMP.xs
-build/README
 build/leak.pl
 build/leaktest
-typemap
-Makefile.PL
+build/README
+CHANGES
+CREDITS
+GMP.xs
+INSTALL
 lib/Math/BigInt/GMP.pm
-t/bigintg.t			# Math::GMP implementation of uint math core
-t/bigintpm.t			# original test, but with Math::GMP
-t/bigintpm.inc			# actual tests
-t/bigfltpm.t			# original test, but with Math::GMP 
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+SIGNATURE
 t/bigfltpm.inc			# actual tests
+t/bigfltpm.t			# original test, but with Math::GMP 
+t/bigintg.t			# Math::GMP implementation of uint math core
+t/bigintpm.inc			# actual tests
+t/bigintpm.t			# original test, but with Math::GMP
 t/pod.t
 t/pod_cov.t
-META.yml                                 Module meta-data (added by MakeMaker)
+TODO
+typemap

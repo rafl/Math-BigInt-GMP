@@ -163,6 +163,33 @@ _num(Class, n)
      RETVAL
 
 ##############################################################################
+# _len() - return the length of the number in base 10 (costly)
+
+int
+_len(Class, n)
+	mpz_t*	n
+  PREINIT:
+    char *buf;
+    char *buf_end;
+
+  CODE:
+    /* len is always >= 1, and might be off (greater) by one than real len */
+    RETVAL = mpz_sizeinbase(*n, 10);
+    if (RETVAL > 1)			/* is at least 10? */
+      {
+      New(0, buf, RETVAL + 1, I8);	/* alloc scratch buffer (len+1) bytes */
+      buf_end = buf + RETVAL - 1;	/* end of storage (-1)*/
+      mpz_get_str(buf, 10, *n);		/* convert to decimal string */
+      if (*buf_end == 0)
+        {
+        RETVAL --;			/* got one shorter than expected */
+        }
+      Safefree(buf);			/* free the scratch buffer */
+      }
+   OUTPUT:
+     RETVAL
+
+##############################################################################
 # _zeros() - return number of trailing zeros (in decimal form)
 # This is costly, since it needs O(N*N) to convert the number to decimal,
 # even though for most cases the number does not have many trailing zeros.
@@ -174,7 +201,6 @@ _zeros(Class,n)
 	mpz_t*	n
 
   PREINIT:
-    SV*	TEMP;
     int len;
     char *buf;
     char *buf_end;
@@ -186,31 +212,29 @@ _zeros(Class,n)
     if (RETVAL != 0)			/* was even */
       {
       /* len is always >= 1, and might be off (greater) by one than real len */
-      len = mpz_sizeinbase(*n, 10);
-      TEMP = newSV(len);		/* alloc len +1 bytes */
-      SvPOK_on(TEMP);			/* make an PV */
-      buf = SvPVX(TEMP);		/* get ptr to storage */ 
-      buf_end = buf + len - 1;		/* end of storage (-1)*/
-      mpz_get_str(buf, 10, *n);		/* convert to decimal string */
       RETVAL = 0;
-      if (*buf_end == 0)		/* points to terminating zero? */
-        {
-        buf_end--;			/* ptr to last real digit */
-        len --;				/* got one shorter than expected */
-        }
-      if (len > 1)			/* '0' has not trailing zeross! */
-        {
-        while (len-- > 0)		/* actually, we should hit a nonzero */
-          {				/* before the end */
-          if (*buf_end-- != '0')
+      len = mpz_sizeinbase(*n, 10);
+      if (len > 1)			/* '0' has no trailing zeros! */
+	{
+	New(0, buf, len + 1, I8);
+	mpz_get_str(buf, 10, *n);	/* convert to decimal string */
+	buf_end = buf + len - 1;
+	if (*buf_end == 0)		/* points to terminating zero? */
+	  {
+          buf_end--;			/* ptr to last real digit */
+          len--;			/* got one shorter than expected */
+          }
+	while (len-- > 0)		/* actually, we should hit a non-zero before the end */
+	  {
+	  if (*buf_end-- != '0')
 	    {
 	    break;
 	    }
           RETVAL++;
-          }
-        }
-       SvREFCNT_dec(TEMP);		/* Bumpersticker: Free Temp! */
-     } /* end if n was even */
+	  }
+        Safefree(buf);			/* free the scratch buffer */
+	}
+      } /* end if n was even */
   OUTPUT:
     RETVAL
 

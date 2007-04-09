@@ -1,7 +1,19 @@
-2007-01-28 v1.19 Tels 5341 tests
+
+2007-04-09 v1.20 Tels 5351 tests
+  * remove PREREQ_FATAL because the toolchain is broken and cannot handle it
+  * take over tests from MBI 1.82 and require it
+  * require Perl 5.6.2 as minimum
+  * speed up _zeros():
+    + use Newx() instead of a full-blown SV for temp storage
+    + no need to allocate temp storage for numbers < 10
+  * put _len() into XS code, making $x->length() faster (about 30% for "123",
+    less for longer numbers as the binary=>decimal conversion dominates)
+  * add POD tests
+  * add MANIFEST.SKIP
+
+2007-01-27 v1.19 Tels 5339 tests
   * add support for octal
   * take over tests from MBI 1.78 and require it
-  * add POD tests
 
 Older Changelog:
 

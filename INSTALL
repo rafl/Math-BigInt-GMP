@@ -1,12 +1,13 @@
 Module to replace Math::BigInt's core math routines by using Math::GMP.
 
-(C) ..--- ----- ----- .---- by - . .-.. ... .-.-.-  All rights reserved.
-
 This package contains a replacement (drop-in) module for Math::BigInt's core,
 Math::BigInt::Calc.pm. It needs the new versions of Math::BigInt and
 Math::BigFloat as they are from Perl 5.7.x onwards.
 
 You need to install the Gnu MP library aka libgmp to compile this module.
+
+INSTALL
+=======
 
 How to install:
 
@@ -14,6 +15,18 @@ How to install:
 	make
 	make test
 	make install
+
+If you have trouble compiling this package because the GMP library is
+installed in a non-standard location, try to pass the INC and LIBS
+arguments to Makefile.PL with the appropriate information. Here
+is an example:
+
+	perl Makefile.PL\
+	 INC="-I/apps/perl588/site/gmp-4.2.1/include"\
+	 LIBS="-L/apps/perl588/site/gmp-4.2.1/lib -lgmp"
+
+USAGE
+=====
 
 To use it, replace:
 

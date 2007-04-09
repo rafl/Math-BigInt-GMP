@@ -15,15 +15,17 @@ BEGIN
 
 SKIP:
   {
-  skip("Test::Pod::Coverage 1.00 required for testing POD coverage", $tests)
+  skip("Test::Pod::Coverage 1.08 required for testing POD coverage", $tests)
     unless do {
-    eval "use Test::Pod::Coverage 1.00";
+    eval "use Test::Pod::Coverage 1.08";
     $@ ? 0 : 1;
     };
 
-  for my $m (qw/Math::BigInt::GMP/)
-    {
-    pod_coverage_ok( $m, "All our ${m}s are covered" );
-    }
+  my $trustme = { 
+    trustme => [ 'isa', 'api_version' ], 
+    coverage_class => 'Pod::Coverage::CountParents',
+    };
+  pod_coverage_ok( 'Math::BigInt::GMP', $trustme, "All our Math::BigInt::GMP are covered" );
+
   }
 
