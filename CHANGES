@@ -1,4 +1,10 @@
 
+2007-04-17 v1.21 Tels 5488 tests
+  * add _as_oct(), _from_oct(), _alen(), _1ex() and some _root() tests
+  * require Math::BigInt 1.83
+  * support api_version() by adding _1ex() and _alen()
+  * _new(): take a shortcut if the passed an IV (integer value)
+
 2007-04-09 v1.20 Tels 5351 tests
   * remove PREREQ_FATAL because the toolchain is broken and cannot handle it
   * take over tests from MBI 1.82 and require it

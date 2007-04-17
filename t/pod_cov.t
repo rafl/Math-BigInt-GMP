@@ -22,7 +22,7 @@ SKIP:
     };
 
   my $trustme = { 
-    trustme => [ 'isa', 'api_version' ], 
+    trustme => [ 'api_version' ], 
     coverage_class => 'Pod::Coverage::CountParents',
     };
   pod_coverage_ok( 'Math::BigInt::GMP', $trustme, "All our Math::BigInt::GMP are covered" );

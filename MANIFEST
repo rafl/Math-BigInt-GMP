@@ -19,6 +19,8 @@ t/bigfltpm.t			# original test, but with Math::GMP
 t/bigintg.t			# Math::GMP implementation of uint math core
 t/bigintpm.inc			# actual tests
 t/bigintpm.t			# original test, but with Math::GMP
+t/biglog.t
+t/bigroot.t
 t/pod.t
 t/pod_cov.t
 TODO

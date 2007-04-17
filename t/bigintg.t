@@ -9,7 +9,7 @@ BEGIN
   chdir 't' if -d 't';
   unshift @INC, '../lib';		# for running manually
   unshift @INC, '../blib/arch';		# for running manually
-  plan tests => 302;
+  plan tests => 353;
   }
 
 use Math::BigInt::GMP;
@@ -105,41 +105,63 @@ ok ($C->_is_zero($C->_one()) || 0,0);
 ok ($C->_is_odd($C->_one()),1); ok ($C->_is_odd($C->_zero())||0,0);
 ok ($C->_is_even($C->_one()) || 0,0); ok ($C->_is_even($C->_zero()),1);
 
-# _len
-$x = $C->_new("1"); ok ($C->_len($x),1);
-$x = $C->_new("12"); ok ($C->_len($x),2);
-$x = $C->_new("123"); ok ($C->_len($x),3);
-$x = $C->_new("1234"); ok ($C->_len($x),4);
-$x = $C->_new("12345"); ok ($C->_len($x),5);
-$x = $C->_new("123456"); ok ($C->_len($x),6);
-$x = $C->_new("1234567"); ok ($C->_len($x),7);
-$x = $C->_new("12345678"); ok ($C->_len($x),8);
-$x = $C->_new("123456789"); ok ($C->_len($x),9);
-
-$x = $C->_new("7"); ok ($C->_len($x),1);
-$x = $C->_new("8"); ok ($C->_len($x),1);
-$x = $C->_new("9"); ok ($C->_len($x),1);
-$x = $C->_new("10"); ok ($C->_len($x),2);
-$x = $C->_new("11"); ok ($C->_len($x),2);
-$x = $C->_new("21"); ok ($C->_len($x),2);
-$x = $C->_new("321"); ok ($C->_len($x),3);
-$x = $C->_new("4321"); ok ($C->_len($x),4);
-$x = $C->_new("54321"); ok ($C->_len($x),5);
-$x = $C->_new("654321"); ok ($C->_len($x),6);
-$x = $C->_new("7654321"); ok ($C->_len($x),7);
-$x = $C->_new("87654321"); ok ($C->_len($x),8);
-$x = $C->_new("987654321"); ok ($C->_len($x),9);
-$x = $C->_new("12345678901234567890"); ok ($C->_len($x), 20);
-$x = $C->_new("1234567890" x 10); ok ($C->_len($x), 10 * 10);
-$x = $C->_new("1234567890" x 100); ok ($C->_len($x), 10 * 100);
-
-for (my $i = 1; $i < 9; $i++)
+sub _check_len
   {
-  my $a = "$i" . '0' x ($i-1);
-  $x = $C->_new($a); 
-  print "# Tried len '$a'\n" unless ok ($C->_len($x),$i);
+  my ($y, $m) = @_;
+
+  my $len = length($y);
+  $x = $C->_new($y);
+  if ($m eq '_len')
+    {
+    ok ($C->$m($x),$len);
+    }
+  else
+    {
+    # equal or at most one bigger 
+    print STDERR "# $len $y". $C->$m($x). "\n" unless
+    ok ($len - $C->$m($x) <= 1, 1);
+    }
   }
 
+# _len and _alen
+for my $m (qw/_len _alen/)
+  {
+  _check_len("1",$m);
+  _check_len("12",$m);
+  _check_len("123",$m);
+  _check_len("1234",$m);
+  _check_len("12345",$m);
+  _check_len("123456",$m);
+  _check_len("1234567",$m);
+  _check_len("12345678",$m);
+  _check_len("123456789",$m);
+  _check_len("1234567890",$m);
+  _check_len("7",$m);
+  _check_len("8",$m);
+  _check_len("9",$m);
+  _check_len("10",$m);
+  _check_len("11",$m);
+  _check_len("21",$m);
+  _check_len("321",$m);
+  _check_len("320",$m);
+  _check_len("4321",$m);
+  _check_len("54321",$m);
+  _check_len("654321",$m);
+  _check_len("7654321",$m);
+  _check_len("7654321",$m);
+  _check_len("87654321",$m);
+  _check_len("987654321",$m);
+  _check_len("9876543219876543210",$m);
+  _check_len("1234567890" x 10,$m);
+  _check_len("1234567890" x 100,$m);
+
+  for (my $i = 1; $i < 9; $i++)
+    {
+    my $a = "$i" . '0' x ($i-1);
+    _check_len($a,$m); 
+    }
+  }
+ 
 # _digit
 $x = $C->_new("123456789");
 ok ($C->_digit($x,0),9);
@@ -395,6 +417,23 @@ ok ($C->_as_hex( $C->_new("0")), '0x0');
 ok ($C->_as_bin( $C->_new("0")), '0b0');
 ok ($C->_as_hex( $C->_new("12")), '0xc');
 ok ($C->_as_bin( $C->_new("12")), '0b1100');
+
+# _from_oct
+$x = $C->_from_oct("001"); ok ($C->_str($x),'1');
+$x = $C->_from_oct("07"); ok ($C->_str($x),'7');
+$x = $C->_from_oct("077"); ok ($C->_str($x),'63');
+$x = $C->_from_oct("07654321"); ok ($C->_str($x),'2054353');
+# _as_oct
+$x = $C->_new("2054353"); ok ($C->_as_oct($x),'07654321');
+$x = $C->_new("63"); ok ($C->_as_oct($x),'077');
+$x = $C->_new("0"); ok ($C->_as_oct($x),'00');
+
+# _1ex
+ok ($C->_str($C->_1ex(0)), "1");
+ok ($C->_str($C->_1ex(1)), "10");
+ok ($C->_str($C->_1ex(2)), "100");
+ok ($C->_str($C->_1ex(12)), "1000000000000");
+ok ($C->_str($C->_1ex(16)), "10000000000000000");
 
 # _check
 $x = $C->_new("123456789");

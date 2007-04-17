@@ -9,13 +9,13 @@ use 5.006002;
 
 use vars qw/$VERSION/;
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 use XSLoader;
 XSLoader::load "Math::BigInt::GMP", $VERSION;
 
 sub import { }			# catch and throw away
-sub api_version() { 1; }	# we are compatible with MBI v1.70 and up
+sub api_version() { 2; }	# we are compatible with MBI v1.83 and up
 
 BEGIN
   {

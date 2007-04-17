@@ -32,7 +32,15 @@ _new(Class,x)
 
   CODE:
     NEW_GMP_MPZ_T;
-    mpz_init_set_str(*RETVAL, SvPV_nolen(x), 0);
+    /* using the IV directly is a bit faster */
+    if (SvIOK(x))
+      {
+      mpz_init_set_si(*RETVAL, SvIV(x));
+      }
+    else
+      {
+      mpz_init_set_str(*RETVAL, SvPV_nolen(x), 10);
+      }
   OUTPUT:
     RETVAL
 
@@ -123,6 +131,19 @@ _ten(Class)
   OUTPUT:
     RETVAL
 
+##############################################################################
+# _1ex()
+
+mpz_t *
+_1ex(Class,x)
+    int x;
+
+  CODE:
+    NEW_GMP_MPZ_T;
+    mpz_init_set_ui(*RETVAL, 10);
+    mpz_pow_ui(*RETVAL, *RETVAL, x);
+  OUTPUT:
+    RETVAL
 
 ##############################################################################
 # DESTROY() - free memory of a GMP number
@@ -186,6 +207,19 @@ _len(Class, n)
         }
       Safefree(buf);			/* free the scratch buffer */
       }
+   OUTPUT:
+     RETVAL
+
+##############################################################################
+# _alen() - return the approx. length of the number in base 10 (fast)
+
+int
+_alen(Class, n)
+	mpz_t*	n
+
+  CODE:
+    /* len is always >= 1, and might be off (greater) by one than real len */
+    RETVAL = mpz_sizeinbase(*n, 10);
    OUTPUT:
      RETVAL
 
