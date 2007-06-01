@@ -2,6 +2,15 @@
 
 # Test blog function (and bpow, since it uses blog), as well as bexp().
 
+# It is too slow to be simple included in bigfltpm.inc, where it would get
+# executed 3 times. One time would be under BareCalc, which shouldn't make any
+# difference since there is no CALC->_log() function, and one time under a
+# subclass, which *should* work.
+
+# But it is better to test the numerical functionality, instead of not testing
+# it at all (which did lead to wrong answers for 0 < $x < 1 in blog() in
+# versions up to v1.63, and for bsqrt($x) when $x << 1 for instance).
+
 use Test::More;
 use strict;
 
@@ -28,14 +37,13 @@ BEGIN
     }
   print "# INC = @INC\n";
 
-  plan tests => 69;
+  plan tests => 70;
   }
 
-use Math::BigFloat only => 'GMP';
+use Math::BigFloat;
+use Math::BigInt;
 
 my $cl = "Math::BigInt";
-
-is (Math::BigInt->config()->{lib}, 'Math::BigInt::GMP', 'GMP loaded');
 
 #############################################################################
 # test log($n) in BigInt (broken until 1.80)
@@ -133,11 +141,21 @@ ok ($cl->new('10')->bpow('0.6',10),   '3.981071706');
 # blog should handle bigint input
 is (Math::BigFloat::blog(Math::BigInt->new(100),10), 2, "blog(100)");
 
+#############################################################################
 # some integer results
 is ($cl->new(2)->bpow(32)->blog(2),  '32', "2 ** 32");
 is ($cl->new(3)->bpow(32)->blog(3),  '32', "3 ** 32");
 is ($cl->new(2)->bpow(65)->blog(2),  '65', "2 ** 65");
 
+my $x = Math::BigInt->new( '777' ) ** 256;
+my $base = Math::BigInt->new( '12345678901234' );
+is ($x->copy()->blog($base), 56, 'blog(777**256, 12345678901234)');
+
+$x = Math::BigInt->new( '777' ) ** 777;
+$base = Math::BigInt->new( '777' );
+is ($x->copy()->blog($base), 777, 'blog(777**777, 777)');
+
+#############################################################################
 # test for bug in bsqrt() not taking negative _e into account
 test_bpow ('200','0.5',10,      '14.14213562');
 test_bpow ('20','0.5',10,       '4.472135955');

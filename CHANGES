@@ -1,4 +1,37 @@
 
+2007-06-01 v1.22 Tels 5527 tests
+  * require Math::BigInt 1.86
+  * support api_version() 2 by adding _nok()
+  * fix compilation issues on Mac/Darwin
+  * _log_int() modifies it's argument instead of just returning a
+    different object as result
+  * speed up _log_int() greatly by taking a guess of the result
+    and then improve it, instead of startig with 1 and going up. This means
+    it takes now a more or less constant time, instead of a time proportional
+    to the size/value of the result:
+
+ Using Math::BigInt::GMP v1.21
+  baselen 2:     3s (3.22 usr +  0.00 sys =  3.22 CPU) @ 7270/s (n=23411)
+  baselen 2 big: 3s (3.11 usr +  0.06 sys =  3.17 CPU) @  962/s (n=3051)
+  baselen 3:     3s (3.20 usr +  0.00 sys =  3.20 CPU) @ 1304/s (n=4173)
+  baselen 7:     3s (3.20 usr +  0.00 sys =  3.20 CPU) @ 3306/s (n=10582)
+  baselen 8:     3s (3.14 usr +  0.00 sys =  3.14 CPU) @ 3769/s (n=11836)
+  baselen 11:    3s (3.24 usr +  0.00 sys =  3.24 CPU) @ 4750/s (n=15392)
+  baselen 14:    3s (3.20 usr +  0.00 sys =  3.20 CPU) @ 5835/s (n=18673)
+  baselen 20:    3s (3.10 usr +  0.03 sys =  3.13 CPU) @ 7621/s (n=23855)
+  baselen 3 big: 4s (3.17 usr +  0.00 sys =  3.17 CPU) @  320/s (n=1016)
+
+ Using Math::BigInt::GMP v1.22
+  baselen 2:     3s (3.15 usr +  0.00 sys =  3.15 CPU) @ 16290/s (n=51316)
+  baselen 2 big: 4s (3.21 usr +  0.01 sys =  3.22 CPU) @ 15933/s (n=51306)
+  baselen 3:     4s (3.12 usr +  0.02 sys =  3.14 CPU) @ 15555/s (n=48844)
+  baselen 7:     4s (3.15 usr +  0.07 sys =  3.22 CPU) @ 15658/s (n=50420)
+  baselen 8:     3s (3.18 usr +  0.01 sys =  3.19 CPU) @ 15610/s (n=49797)
+  baselen 11:    3s (3.14 usr +  0.00 sys =  3.14 CPU) @ 15555/s (n=48844)
+  baselen 14:    3s (3.15 usr +  0.00 sys =  3.15 CPU) @ 15506/s (n=48844)
+  baselen 20:    3s (3.14 usr +  0.01 sys =  3.15 CPU) @ 15506/s (n=48844)
+  baselen 3 big: 3s (3.10 usr +  0.04 sys =  3.14 CPU) @ 15555/s (n=48844)
+
 2007-04-17 v1.21 Tels 5488 tests
   * add _as_oct(), _from_oct(), _alen(), _1ex() and some _root() tests
   * require Math::BigInt 1.83

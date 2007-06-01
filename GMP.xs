@@ -84,6 +84,17 @@ _from_oct(Class,x)
     RETVAL
 
 ##############################################################################
+# _set() - set an already existing object to the given scalar value
+
+void
+_set(Class,n,x)
+	mpz_t*	n
+	SV*	x
+
+  CODE:
+    mpz_init_set_ui(*n, SvIV(x));
+
+##############################################################################
 # _zero()
 
 mpz_t *

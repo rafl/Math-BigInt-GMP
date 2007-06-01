@@ -9,7 +9,7 @@ BEGIN
   chdir 't' if -d 't';
   unshift @INC, '../lib';		# for running manually
   unshift @INC, '../blib/arch';		# for running manually
-  plan tests => 353;
+  plan tests => 356;
   }
 
 use Math::BigInt::GMP;
@@ -21,6 +21,13 @@ my $C = 'Math::BigInt::GMP';		# pass classname to sub's
 # _new and _str
 my $x = $C->_new("123"); my $y = $C->_new("321");
 ok (ref($x),'Math::BigInt::GMP'); ok ($C->_str($x),123); ok ($C->_str($y),321);
+
+###############################################################################
+# _set
+
+my $b = $C->_new("123");
+$C->_set($b,12);
+ok ($C->_str($b),12);
 
 ###############################################################################
 # _add, _sub, _mul, _div
@@ -383,10 +390,14 @@ $x = $C->_new("81");
 
 my ($r, $exact) = $C->_log_int($x, $C->_new("3"));
 ok ($C->_str( $r ), '4');
+ok ($C->_str( $x ), '4');
 ok ($exact, 1);
 
+$x = $C->_new("81");
+ 
 ($r, $exact) = $C->_log_int($x,3);
 ok ($C->_str( $r ), '4');
+ok ($C->_str( $x ), '4');
 ok ($exact, 1);
 
 ###############################################################################

@@ -9,7 +9,7 @@ use 5.006002;
 
 use vars qw/$VERSION/;
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 use XSLoader;
 XSLoader::load "Math::BigInt::GMP", $VERSION;
@@ -71,11 +71,31 @@ sub _log_int
     return (_zero($c),undef);
     }
 
-  my $trial = _copy($c,$base);
-  my $x_org = _copy($c,$x);
-  $x = _one($c);
+  # Compute a guess for the result based on:
+  # $guess = int ( length_in_base_10(X) / ( log(base) / log(10) ) )
+  my $len = _alen($c,$x);
+  my $log = log( _num($c,$base) ) / log(10);
 
-  my $a;
+  # calculate now a guess based on the values obtained above:
+  my $x_org = _copy($c,$x);
+
+  # keep the reference to $x, modifying it in place
+  _set($c, $x, int($len / $log) - 1);
+
+  my $trial = _pow ($c, _copy($c, $base), $x);
+  my $a = _acmp($c,$trial,$x_org);
+
+  if ($a == 0)
+    {
+    return ($x,1);
+    }
+  elsif ($a > 0)
+    {
+    # too big, shouldn't happen
+    _div($c,$trial,$base); _dec($c, $x);
+    }
+
+  # find the real result by going forward:
   my $base_mul = _mul($c, _copy($c,$base), $base);
   my $two = _two($c);
 
