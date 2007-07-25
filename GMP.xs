@@ -4,7 +4,7 @@
 #include "gmp.h"
 
 /*
-Math::BigInt::GMP XS code, largely based on Math::GMP, a Perl module for
+Math::BigInt::GMP XS code, loosely based on Math::GMP, a Perl module for
 high-speed arbitrary size integer calculations (C) 2000 James H. Turner
 */
 
@@ -33,9 +33,9 @@ _new(Class,x)
   CODE:
     NEW_GMP_MPZ_T;
     /* using the IV directly is a bit faster */
-    if (SvIOK(x))
+    if (SvUOK(x))
       {
-      mpz_init_set_si(*RETVAL, SvIV(x));
+      mpz_init_set_si(*RETVAL, (UV)SvUV(x));
       }
     else
       {

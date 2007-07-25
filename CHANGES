@@ -1,4 +1,9 @@
 
+2007-07-25 v1.23 Tels 5527 tests
+  * require Math::BigInt 1.87
+  * fix for _new() (appeared under Cygwin, but possible others, thanx
+    Linda W. (report) and Reini Urban (patch)!)
+
 2007-06-01 v1.22 Tels 5527 tests
   * require Math::BigInt 1.86
   * support api_version() 2 by adding _nok()
