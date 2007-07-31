@@ -3,6 +3,11 @@
 #include "XSUB.h"
 #include "gmp.h"
 
+/* for Perl prior to v5.7.1 */
+#ifndef SvUOK
+#  define SvUOK(sv) SvIOK_UV(sv)
+#endif
+
 /*
 Math::BigInt::GMP XS code, loosely based on Math::GMP, a Perl module for
 high-speed arbitrary size integer calculations (C) 2000 James H. Turner
@@ -15,11 +20,11 @@ PROTOTYPES: ENABLE
 #define NEW_GMP_MPZ_T_INIT RETVAL = malloc (sizeof(mpz_t)); mpz_init(*RETVAL);
 #define GMP_GET_ARG_0 	   if (sv_derived_from(x, "Math::BigInt::GMP")) {\
 			   IV tmp = SvIV((SV*)SvRV(x));\
-			   TEMP = (mpz_t*) tmp;\
+			   TEMP = INT2PTR(mpz_t*, tmp);\
 		  } else { croak("x is not of type Math::BigInt::GMP"); }
 #define GMP_GET_ARG_1 	   if (sv_derived_from(y, "Math::BigInt::GMP")) {\
 			   IV tmp = SvIV((SV*)SvRV(y));\
-			   TEMP_1 = (mpz_t*) tmp;\
+			   TEMP_1 = INT2PTR(mpz_t*, tmp);\
 		  } else { croak("y is not of type Math::BigInt::GMP"); }
 #define GMP_GET_ARGS_0_1   GMP_GET_ARG_0; GMP_GET_ARG_1;
 
