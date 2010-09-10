@@ -48,6 +48,7 @@ WriteMakefile(
     'PREREQ_PM'		=> {
 				Math::BigInt => 1.87,
 				XSLoader => 0.02,
-			   }, 
+			   },
     'LIBS'		=> ['-lgmp'],
+    'SIGN' => 1,
 );
