@@ -1,4 +1,6 @@
 use ExtUtils::MakeMaker;
+use lib 'inc'; # load our bundled version of Devel::CheckLib
+use Devel::CheckLib;
 
 #printf "Your OS is [%s]!\n---\n", $Config::Config{'osname'};  ### for testing purpose only
 
@@ -41,6 +43,8 @@ sub MY::metafile {
 
   "metafile:\n$dump";
   }
+
+check_lib_or_exit(lib => 'gmp', header => 'gmp.h', @ARGV);
 
 WriteMakefile(
     'NAME'		=> 'Math::BigInt::GMP',
