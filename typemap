@@ -2,13 +2,8 @@ mpz_t *		MPZ
 
 INPUT
 MPZ
-        if (sv_derived_from($arg, \"Math::BigInt::GMP\")) {
-            IV tmp = SvIV((SV*)SvRV($arg));
-            $var = INT2PTR($type, tmp);
-        }
-        else
-            croak(\"$var is not of type Math::BigInt::GMP\")
+        $var = mpz_from_sv($arg);
 
 OUTPUT
 MPZ
-	sv_setref_pv($arg, \"Math::BigInt::GMP\", INT2PTR(void*, $var));
+        $arg = sv_from_mpz($var);
