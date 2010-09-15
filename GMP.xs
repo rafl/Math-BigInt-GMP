@@ -8,13 +8,37 @@
 #  define SvUOK(sv) SvIOK_UV(sv)
 #endif
 
+#ifndef PERL_UNUSED_ARG
+#  define PERL_UNUSED_ARG(x) ((void)x)
+#endif
+
+#ifndef gv_stashpvs
+#  define gv_stashpvs(name, create) gv_stashpvn(name, sizeof(name) - 1, create)
+#endif
+
+#ifndef PERL_MAGIC_ext
+#  define PERL_MAGIC_ext '~'
+#endif
+
+#if defined(USE_ITHREADS) && defined(MGf_DUP)
+#  define GMP_THREADSAFE 1
+#else
+#  define GMP_THREADSAFE 0
+#endif
+
+#ifdef sv_magicext
+#  define GMP_HAS_MAGICEXT 1
+#else
+#  define GMP_HAS_MAGICEXT 0
+#endif
+
 #define NEW_GMP_MPZ_T	   RETVAL = malloc (sizeof(mpz_t));
 #define NEW_GMP_MPZ_T_INIT RETVAL = malloc (sizeof(mpz_t)); mpz_init(*RETVAL);
 #define GMP_GET_ARG_0      TEMP = mpz_from_sv(x);
 #define GMP_GET_ARG_1 	   TEMP_1 = mpz_from_sv(y);
 #define GMP_GET_ARGS_0_1   GMP_GET_ARG_0; GMP_GET_ARG_1;
 
-#ifdef USE_ITHREADS
+#if GMP_THREADSAFE
 STATIC int
 dup_gmp_mpz (pTHX_ MAGIC *mg, CLONE_PARAMS *params)
 {
@@ -27,44 +51,53 @@ dup_gmp_mpz (pTHX_ MAGIC *mg, CLONE_PARAMS *params)
 }
 #endif
 
+#if GMP_HAS_MAGICEXT
 STATIC MGVTBL vtbl_gmp = {
   NULL, /* get */
   NULL, /* set */
   NULL, /* len */
   NULL, /* clear */
   NULL, /* free */
-#ifdef MGf_COPY
+# ifdef MGf_COPY
   NULL, /* copy */
-#endif
-#ifdef MGf_DUP
-# ifdef USE_ITHREADS
-  dup_gmp_mpz,
-# else
-  NULL, /* dup */
 # endif
-#endif
-#ifdef MGf_LOCAL
+# ifdef MGf_DUP
+#  if GMP_THREADSAFE
+  dup_gmp_mpz,
+#  else
+  NULL, /* dup */
+#  endif
+# endif
+# ifdef MGf_LOCAL
   NULL, /* local */
-#endif
+# endif
 };
+#endif
 
 STATIC SV *
 sv_from_mpz (mpz_t *mpz)
 {
   SV *sv = newSV(0);
   SV *obj = newRV_noinc(sv);
-#ifdef USE_ITHREADS
+#if GMP_THREADSAFE
   MAGIC *mg;
+#endif
+#if !GMP_HAS_MAGICEXT
+  SV *refaddr = sv_2mortal(newSViv(PTR2IV(mpz)));
 #endif
 
   sv_bless(obj, gv_stashpvs("Math::BigInt::GMP", 0));
 
-#ifdef USE_ITHREADS
+#if GMP_THREADSAFE && GMP_HAS_MAGICEXT
   mg =
 #endif
+#if GMP_HAS_MAGICEXT
     sv_magicext(sv, NULL, PERL_MAGIC_ext, &vtbl_gmp, (void *)mpz, 0);
+#else
+  sv_magic(sv, NULL, PERL_MAGIC_ext, (void *)refaddr, HEf_SVKEY);
+#endif
 
-#ifdef USE_ITHREADS
+#if GMP_THREADSAFE && GMP_HAS_MAGICEXT
   mg->mg_flags |= MGf_DUP;
 #endif
 
@@ -80,8 +113,16 @@ mpz_from_sv (SV *sv)
     croak("not of type Math::BigInt::GMP");
 
   for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
-    if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &vtbl_gmp) {
+    if (mg->mg_type == PERL_MAGIC_ext
+#if GMP_HAS_MAGICEXT
+        && mg->mg_virtual == &vtbl_gmp
+#endif
+        ) {
+#if GMP_HAS_MAGICEXT
       return (mpz_t *)mg->mg_ptr;
+#else
+      return INT2PTR(mpz_t *, SvIV((SV *)mg->mg_ptr));
+#endif
     }
   }
 

@@ -8,6 +8,8 @@ use Config;
 BEGIN {
     plan skip_all => 'Perl compiled without ithreads'
         unless $Config{useithreads};
+    plan skip_all => 'ithreads support requires perl 5.8 or newer'
+        unless $] >= 5.008000;
     plan tests => 22;
 }
 
