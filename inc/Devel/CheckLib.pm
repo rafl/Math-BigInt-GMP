@@ -2,9 +2,10 @@
 
 package Devel::CheckLib;
 
+use 5.00405; #postfix foreach
 use strict;
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '0.7';
+$VERSION = '0.8';
 use Config;
 
 use File::Spec;
@@ -214,13 +215,16 @@ sub assert_lib {
     my @cc = _findcc();
     my @missing;
     my @wrongresult;
+    my @use_headers;
 
     # first figure out which headers we can't find ...
     for my $header (@headers) {
+        push @use_headers, $header;
         my($ch, $cfile) = File::Temp::tempfile(
             'assertlibXXXXXXXX', SUFFIX => '.c'
         );
-        print $ch qq{#include <$header>\nint main(void) { return 0; }\n};
+        print $ch qq{#include <$_>\n} for @use_headers;
+        print $ch qq{int main(void) { return 0; }\n};
         close($ch);
         my $exefile = File::Temp::mktemp( 'assertlibXXXXXXXX' ) . $Config{_exe};
         my @sys_cmd;
