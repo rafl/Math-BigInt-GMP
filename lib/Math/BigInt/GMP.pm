@@ -121,6 +121,17 @@ sub _log_int
   ($x,$exact);
   }
 
+sub STORABLE_freeze {
+    my ($self, $cloning) = @_;
+    return Math::BigInt::GMP->_num($self);
+}
+
+sub STORABLE_thaw {
+    my ($self, $cloning, $serialized) = @_;
+    Math::BigInt::GMP->_new_attach($self, $serialized);
+    return $self;
+}
+
 1;
 __END__
 
