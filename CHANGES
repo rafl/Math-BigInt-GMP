@@ -1,3 +1,7 @@
+2010-09-21 v1.31 rafl 5559 tests  DEVELOPMENT RELEASE
+  * Add hooks for Storable (de-)serialisation.
+  * Avoid failure in the destructor if someone blessed nonsense into our class.
+
 2010-09-20 v1.30 rafl 5558 tests
   * Re-upload 1.29 as a stable release without further changes.
 
