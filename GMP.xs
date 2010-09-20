@@ -76,11 +76,9 @@ STATIC MGVTBL vtbl_gmp = {
 };
 #endif
 
-STATIC SV *
-sv_from_mpz (mpz_t *mpz)
+STATIC void
+attach_mpz_to_sv (SV *sv, mpz_t *mpz)
 {
-  SV *sv = newSV(0);
-  SV *obj = newRV_noinc(sv);
 #if GMP_THREADSAFE
   MAGIC *mg;
 #endif
@@ -88,20 +86,29 @@ sv_from_mpz (mpz_t *mpz)
   SV *refaddr = sv_2mortal(newSViv(PTR2IV(mpz)));
 #endif
 
-  sv_bless(obj, gv_stashpvs("Math::BigInt::GMP", 0));
+  sv_bless(sv, gv_stashpvs("Math::BigInt::GMP", 0));
 
 #if GMP_THREADSAFE && GMP_HAS_MAGICEXT
   mg =
 #endif
 #if GMP_HAS_MAGICEXT
-    sv_magicext(sv, NULL, PERL_MAGIC_ext, &vtbl_gmp, (void *)mpz, 0);
+    sv_magicext(SvRV(sv), NULL, PERL_MAGIC_ext, &vtbl_gmp, (void *)mpz, 0);
 #else
-  sv_magic(sv, NULL, PERL_MAGIC_ext, (void *)refaddr, HEf_SVKEY);
+  sv_magic(SvRV(sv), NULL, PERL_MAGIC_ext, (void *)refaddr, HEf_SVKEY);
 #endif
 
 #if GMP_THREADSAFE && GMP_HAS_MAGICEXT
   mg->mg_flags |= MGf_DUP;
 #endif
+}
+
+STATIC SV *
+sv_from_mpz (mpz_t *mpz)
+{
+  SV *sv = newSV(0);
+  SV *obj = newRV_noinc(sv);
+
+  attach_mpz_to_sv(obj, mpz);
 
   return obj;
 }
@@ -151,7 +158,7 @@ MODULE = Math::BigInt::GMP		PACKAGE = Math::BigInt::GMP
 PROTOTYPES: ENABLE
 
 ##############################################################################
-# _new() 
+# _new()
 
 mpz_t *
 _new(Class,x)
@@ -170,6 +177,25 @@ _new(Class,x)
       }
   OUTPUT:
     RETVAL
+
+##############################################################################
+# _new_attach()
+
+void
+_new_attach(Class,sv,x)
+    SV *sv
+    SV *x
+  PREINIT:
+    mpz_t *mpz;
+  CODE:
+    mpz = malloc (sizeof(mpz_t));
+    if (SvUOK(x)) {
+      mpz_init_set_si(*mpz, (UV)SvUV(x));
+    }
+    else {
+      mpz_init_set_str(*mpz, SvPV_nolen(x), 10);
+    }
+    attach_mpz_to_sv(sv, mpz);
 
 ##############################################################################
 # _from_bin()
