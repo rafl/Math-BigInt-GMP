@@ -1,3 +1,6 @@
+2010-09-20 v1.30 rafl 5558 tests
+  * Re-upload 1.29 as a stable release without further changes.
+
 2010-09-19 v1.29 rafl 5558 tests  DEVELOPMENT RELEASE
   * Attempt to fix a bug in the bundled version Devel::CheckLib.
     It used to ignore @Config{qw(ccflags ldflags)} and only tried to look for
