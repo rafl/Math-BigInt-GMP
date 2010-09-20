@@ -3,6 +3,8 @@
 #include "XSUB.h"
 #include "gmp.h"
 
+typedef mpz_t mpz_t_ornull;
+
 /* for Perl prior to v5.7.1 */
 #ifndef SvUOK
 #  define SvUOK(sv) SvIOK_UV(sv)
@@ -104,8 +106,8 @@ sv_from_mpz (mpz_t *mpz)
   return obj;
 }
 
-mpz_t *
-mpz_from_sv (SV *sv)
+STATIC mpz_t *
+mpz_from_sv_nofail (SV *sv)
 {
   MAGIC *mg;
 
@@ -126,7 +128,18 @@ mpz_from_sv (SV *sv)
     }
   }
 
-  croak("failed to fetch mpz pointer");
+  return (mpz_t *)NULL;
+}
+
+STATIC mpz_t *
+mpz_from_sv (SV *sv)
+{
+  mpz_t *mpz;
+
+  if (!(mpz = mpz_from_sv_nofail(sv)))
+    croak("failed to fetch mpz pointer");
+
+  return mpz;
 }
 
 /*
@@ -275,11 +288,13 @@ _1ex(Class,x)
 
 void
 DESTROY(n)
-	mpz_t*	n
+	mpz_t_ornull*	n
 
   PPCODE:
-    mpz_clear(*n);
-    free(n);
+    if (n) {
+        mpz_clear(*n);
+        free(n);
+    }
 
 ##############################################################################
 # _num() - numify, return string so that atof() and atoi() can use it

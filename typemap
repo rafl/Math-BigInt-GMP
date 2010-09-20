@@ -1,8 +1,11 @@
 mpz_t *		MPZ
+mpz_t_ornull *	MPZ_NF
 
 INPUT
 MPZ
         $var = mpz_from_sv($arg);
+MPZ_NF
+        $var = mpz_from_sv_nofail($arg);
 
 OUTPUT
 MPZ
